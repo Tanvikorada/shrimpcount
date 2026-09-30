@@ -1,14 +1,13 @@
-// FLIGHT3D (used by journey.js for the inside of the shed and the tank): one unbroken drone flight: in from the sea to a seaside hatchery, down into a shed, along the raceway
-// tanks, over a sample bowl of larvae, then up into the sky and on to the real pond footage.
+// FLIGHT3D (the whole journey, used by journey.js): one unbroken drone flight: in from the sea to a seaside hatchery, down into a shed, along the raceway
+// tanks, over a sample bowl of larvae, down into a tank where they grow into prawns, then out over the farm ponds.
 // The world is simple 3D geometry, but what you see on it is photographs: photoreal frames made from guide renders
 // of this same scene are projected back onto the geometry from the poses they were rendered at (camera projection
 // mapping), and the flight blends between neighbouring projectors. Anything no photo covers falls back to the render.
 import * as THREE from "three";
 import { Water } from "three/addons/objects/Water.js";
 import { Sky } from "three/addons/objects/Sky.js";
-import { larvaTexture, clamp01, smooth, lerp, band, whileVisible, makeRenderer } from "./larva.js";
+import { larvaTexture, clamp01, smooth, lerp, band } from "./larva.js";
 
-const SPLIT = 0.62; // share of the section given to the hatchery flight; the rest is the pond film
 // projector photos: [flight progress j, paints inside the entry shed (1) or outside it (0)].
 // Each was made from a guide render at exactly that j (see _render.html). The side flag stops a photo taken
 // outside from painting its made-up view through the door onto the real interior, and the other way round.
@@ -62,66 +61,6 @@ const texFrond = () => canvasTex(128, 512, (g, w, h) => {
   for (let y = 20; y < h; y += 10) { const len = (w / 2) * Math.sin((y / h) * Math.PI) * 0.95; g.strokeStyle = y % 20 ? "#5f7a2c" : "#4d6a25"; g.lineWidth = 5;
     g.beginPath(); g.moveTo(w / 2, y); g.lineTo(w / 2 - len, y - 18); g.stroke(); g.beginPath(); g.moveTo(w / 2, y); g.lineTo(w / 2 + len, y - 18); g.stroke(); }
 });
-
-export function initJourney({ ScrollTrigger, reduce }) {
-  const section = document.getElementById("journey");
-  const canvas = document.getElementById("journey-gl");
-  const video = section.querySelector(".film-video");
-  const haze = section.querySelector(".haze");
-  const caps = [...section.querySelectorAll(".j-cap")];
-  let renderer;
-  try { renderer = makeRenderer(canvas, { opaque: true, maxDpr: 1.75 }); } catch { renderer = null; }
-  const mobile = window.innerWidth < 760;
-
-  // ---------- pond film (second half) ----------
-  let filmLoaded = false;
-  new IntersectionObserver(([e]) => {
-    if (!e.isIntersecting || filmLoaded || reduce) return;
-    filmLoaded = true;
-    const src = mobile ? "media/farm-scrub-sm.mp4" : "media/farm-scrub.mp4";
-    fetch(src).then((r) => (r.ok ? r.blob() : Promise.reject(r.status))).then((b) => { video.src = URL.createObjectURL(b); }).catch(() => { video.src = src; });
-  }, { rootMargin: "2000px 0px" }).observe(section);
-
-  let J = reduce ? 1 : 0, target = J;
-  if (ScrollTrigger && !reduce) ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
-
-  let render3D = null;
-  try { render3D = renderer ? build3D(renderer, canvas, mobile, { photos: !location.search.includes("noproj") }) : null; } catch { render3D = null; }
-  // hatchery captions were placed on the keyframe timeline; move them to where those moments now fall
-  if (render3D) {
-    caps.forEach((c) => { const at = Number(c.dataset.at); if (at < SPLIT) c.dataset.at = String(render3D.scrollFor(Math.min(0.995, at / SPLIT)) * SPLIT); });
-    // keep each caption's fade inside the gap to its neighbours so two never show at once
-    const at = caps.map((c) => Number(c.dataset.at));
-    caps.forEach((c, i) => {
-      const gap = Math.min(i ? at[i] - at[i - 1] : 1, i < at.length - 1 ? at[i + 1] - at[i] : 1);
-      c.dataset.w = String(Math.min(Number(c.dataset.w || 0.06), gap * 0.5));
-    });
-  }
-
-  function frame(now, dt) {
-    J += (target - J) * Math.min(1, dt * 3.5);
-    const j3 = band(J, 0, SPLIT);
-    const filmIn = smooth(band(J, SPLIT - 0.045, SPLIT - 0.005));
-    haze.style.opacity = String(Math.max(0, Math.sin(Math.PI * band(J, SPLIT - 0.05, SPLIT + 0.01))) * 0.75);
-    video.style.opacity = String(filmIn);
-    video.style.transform = `scale(${1.12 - 0.12 * smooth(band(J, SPLIT - 0.045, SPLIT + 0.05))})`;
-    canvas.style.opacity = String(1 - filmIn);
-    canvas.style.filter = filmIn > 0.01 ? `blur(${(filmIn * 6).toFixed(1)}px)` : "";
-    if (render3D && filmIn < 1) render3D(j3, now, dt);
-    const fp = band(J, SPLIT, 1);
-    const d = video.duration;
-    if (filmIn > 0 && d && video.readyState >= 1 && !video.seeking) {
-      const t = fp * (d - 0.05);
-      if (Math.abs(video.currentTime - t) > 1 / 30) video.currentTime = t;
-    }
-    caps.forEach((c) => {
-      const o = clamp01((1 - Math.abs(J - Number(c.dataset.at)) / Number(c.dataset.w || 0.06)) * 1.7);
-      c.style.opacity = String(o); c.style.transform = `translateY(${(1 - o) * 30}px)`;
-    });
-  }
-  whileVisible(section, frame);
-  frame(performance.now(), 0.016);
-}
 
 export function build3D(renderer, canvas, mobile, opts = {}) {
   const rnd = mulberry32(20260926);
@@ -216,22 +155,62 @@ export function build3D(renderer, canvas, mobile, opts = {}) {
   for (let i = 0; i < 46; i++) { const x = -220 + i * 9.5 + rnd() * 4; if (Math.abs(x - 8) < 26) continue; palm(x, 66 + rnd() * 16, 9 + rnd() * 5); }
   for (let i = 0; i < 18; i++) palm(-110 + rnd() * 220, -95 - rnd() * 60, 8 + rnd() * 5);
 
-  // inland: grow-out ponds in a grid of earthen bunds, paddle-wheel froth on each
-  const pondMat = new THREE.MeshStandardMaterial({ color: 0x1d3833, roughness: 0.4, metalness: 0, envMapIntensity: 0.35, normalMap: normals, normalScale: new THREE.Vector2(0.25, 0.25) });
-  const bundMat = new THREE.MeshStandardMaterial({ color: 0x8b7d5e, roughness: 1 });
-  const pondGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
-  const ponds = new THREE.InstancedMesh(pondGeo, pondMat, 140), bunds = new THREE.InstancedMesh(pondGeo, bundMat, 140);
-  const pondFroth = [];
-  let pi = 0; const pm = new THREE.Matrix4();
-  for (let cx = -330; cx < 330 && pi < 140; cx += 58) for (let cz = -150; cz > -600 && pi < 140; cz -= 50) {
-    if (Math.abs(cx - 120) < 40 || rnd() < 0.12) continue;
-    const pw = 44 + rnd() * 8, pd = 36 + rnd() * 8;
-    bunds.setMatrixAt(pi, pm.compose(new THREE.Vector3(cx, 0.66, cz), new THREE.Quaternion(), new THREE.Vector3(pw + 5, 1, pd + 5)));
-    ponds.setMatrixAt(pi, pm.compose(new THREE.Vector3(cx, 0.7, cz), new THREE.Quaternion(), new THREE.Vector3(pw, 1, pd)));
-    for (let a = 0; a < 4; a++) pondFroth.push(cx + (a % 2 ? 1 : -1) * pw * 0.28, 0.75, cz + (a < 2 ? 1 : -1) * pd * 0.28);
-    pi++;
+  // inland: grow-out ponds. One reflective water sheet with a grid of raised earthen dikes on it, and
+  // paddle-wheel aerators churning white water in every pond.
+  const PONDS = { x0: -330, x1: 330, z0: -130, z1: -620, y: 0.95 };
+  const pondWater = new Water(new THREE.PlaneGeometry(PONDS.x1 - PONDS.x0, PONDS.z0 - PONDS.z1), { textureWidth: 512, textureHeight: 512, waterNormals: normals,
+    sunDirection: sun.clone(), sunColor: 0xfff0dc, waterColor: 0x5b7a2e, distortionScale: 0.7, fog: true, alpha: 1 });
+  // grow-out ponds are green with algae: less sky mirror than the sea, more body colour
+  pondWater.material.fragmentShader = pondWater.material.fragmentShader
+    .replace("vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;", "vec3 scatter = ( 0.55 + 0.45 * max( 0.0, dot( surfaceNormal, eyeDirection ) ) ) * waterColor;")
+    .replace("reflectionSample * specularLight ), reflectance);", "reflectionSample * specularLight ), min( reflectance, 0.42 ));");
+  pondWater.rotation.x = -Math.PI / 2; pondWater.position.set((PONDS.x0 + PONDS.x1) / 2, PONDS.y, (PONDS.z0 + PONDS.z1) / 2); scene.add(pondWater);
+  // seen from the hatchery the ponds are far off: a plain green sheet there saves the mirror pass
+  const pondFlat = new THREE.Mesh(new THREE.PlaneGeometry(PONDS.x1 - PONDS.x0, PONDS.z0 - PONDS.z1).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x55683e, roughness: 0.35 }));
+  pondFlat.position.copy(pondWater.position); scene.add(pondFlat);
+  const dikeTex = canvasTex(256, 256, (g, w, h) => { g.fillStyle = "#8c7b55"; g.fillRect(0, 0, w, h); noise(g, w, h, 1400, ["#7a6a4a", "#a0906a", "#6b7a3e", "#58692f", "#76883f"], 2, 12, 0.55); }, [8, 1]);
+  const dikeMat = new THREE.MeshStandardMaterial({ map: dikeTex, roughness: 1 });
+  const dikeGeo = new THREE.BoxGeometry(1, 1, 1);
+  const dikes = new THREE.InstancedMesh(dikeGeo, dikeMat, 900); let di = 0;
+  // a paddle-wheel aerator: a dark paddle drum on a shaft between two white floats
+  const wheels = new THREE.InstancedMesh(new THREE.BoxGeometry(3.4, 0.55, 0.55), new THREE.MeshStandardMaterial({ color: 0x2c3b48, roughness: 0.6 }), 700); let wi = 0;
+  const floats = new THREE.InstancedMesh(new THREE.BoxGeometry(0.8, 0.45, 1.5), new THREE.MeshStandardMaterial({ color: 0xdfe6ea, roughness: 0.5 }), 1400); let fi = 0;
+  const aerators = [];
+  const pm = new THREE.Matrix4(), pq = new THREE.Quaternion();
+  const dike = (x, z, sx, sz) => { dikes.setMatrixAt(di++, pm.compose(new THREE.Vector3(x, PONDS.y + 0.3, z), pq, new THREE.Vector3(sx, 1.3, sz))); };
+  const cols = []; for (let x = PONDS.x0; x <= PONDS.x1; x += 55) cols.push(x + (x > PONDS.x0 && x < PONDS.x1 - 1 ? (rnd() - 0.5) * 14 : 0));
+  const rows = []; for (let z = PONDS.z0; z >= PONDS.z1; z -= 49) rows.push(z + (z < PONDS.z0 && z > PONDS.z1 + 1 ? (rnd() - 0.5) * 12 : 0));
+  cols.forEach((x) => dike(x, (PONDS.z0 + PONDS.z1) / 2, 6, PONDS.z0 - PONDS.z1));          // long dikes
+  rows.forEach((z) => dike((PONDS.x0 + PONDS.x1) / 2, z, PONDS.x1 - PONDS.x0, 6));          // cross dikes
+  for (let i = 0; i < cols.length - 1; i++) for (let k = 0; k < rows.length - 1; k++) {
+    const cx = (cols[i] + cols[i + 1]) / 2, cz = (rows[k] + rows[k + 1]) / 2;
+    if (Math.abs(cx - 120) < 30) { dike(cx, cz, 50, 45); continue; }                            // the road strip stays dry
+    const n = 2 + (rnd() < 0.5 ? 2 : 0);
+    for (let a = 0; a < n; a++) {
+      const ax = cx + (a % 2 ? 1 : -1) * 13, az = cz + (a < 2 ? 1 : -1) * 11, ang = rnd() * Math.PI;
+      pq.setFromAxisAngle(new THREE.Vector3(0, 1, 0), ang);
+      wheels.setMatrixAt(wi++, pm.compose(new THREE.Vector3(ax, PONDS.y + 0.25, az), pq, new THREE.Vector3(1, 1, 1)));
+      for (const sd of [-1, 1]) floats.setMatrixAt(fi++, pm.compose(new THREE.Vector3(ax + Math.cos(ang) * 2 * sd, PONDS.y + 0.12, az - Math.sin(ang) * 2 * sd), pq, new THREE.Vector3(1, 1, 1)));
+      pq.identity();
+      aerators.push([ax, az, ang]);
+    }
   }
-  ponds.count = bunds.count = pi; ponds.receiveShadow = true; scene.add(bunds, ponds);
+  dikes.count = di; wheels.count = wi; floats.count = fi; dikes.receiveShadow = true; scene.add(dikes, wheels, floats);
+  // the country beyond: farmland to the horizon, and tree lines and village groves breaking it up
+  const farLand = new THREE.Mesh(new THREE.PlaneGeometry(6000, 3200).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x6d6f45, roughness: 1 }));
+  farLand.position.set(0, 0.5, -2330); scene.add(farLand);
+  const treeGeo = new THREE.IcosahedronGeometry(1, 1); treeGeo.scale(1, 0.8, 1);
+  const trees = new THREE.InstancedMesh(treeGeo, new THREE.MeshStandardMaterial({ color: 0x33452a, roughness: 1, flatShading: true }), 1600); let ti = 0;
+  const tree = (x, z, r) => { if (ti < 1600) trees.setMatrixAt(ti++, pm.compose(new THREE.Vector3(x, r * 0.7, z), pq, new THREE.Vector3(r, r * (1 + rnd() * 0.4), r))); };
+  for (let x = PONDS.x0 - 30; x < PONDS.x1 + 30; x += 7) { tree(x + rnd() * 5, PONDS.z1 - 12 - rnd() * 10, 3 + rnd() * 3); }
+  for (let z = PONDS.z0; z > PONDS.z1; z -= 8) { tree(PONDS.x0 - 12 - rnd() * 8, z, 3 + rnd() * 3); tree(PONDS.x1 + 12 + rnd() * 8, z, 3 + rnd() * 3); }
+  for (let i = 0; i < 1000; i++) { const x = (rnd() - 0.5) * 3000, z = -700 - rnd() * 1800; if (rnd() < 0.6) { const n = 4 + rnd() * 10; for (let k = 0; k < n; k++) tree(x + (rnd() - 0.5) * 40, z + (rnd() - 0.5) * 40, 4 + rnd() * 5); } }
+  trees.count = ti; scene.add(trees);
+  // churned white water behind every wheel
+  const NPF = aerators.length * (mobile ? 16 : 30), pfPos = new Float32Array(NPF * 3), pfSeed = new Float32Array(NPF);
+  for (let i = 0; i < NPF; i++) pfSeed[i] = rnd();
+  const pondFrothGeo = new THREE.BufferGeometry(); pondFrothGeo.setAttribute("position", new THREE.BufferAttribute(pfPos, 3));
+  const pondFroth = [];
 
   // ---------- inside the entry shed: raceways, shade net, tube lights (after the reference photos) ----------
   const inside = new THREE.Group(); entry.add(inside);
@@ -275,8 +254,8 @@ export function build3D(renderer, canvas, mobile, opts = {}) {
   for (let i = 0; i < NF; i++) { const sgn = rnd() < 0.5 ? -1 : 1; fPos[i * 3] = sgn * lerp(WX0 + 0.4, WX1 - 0.4, rnd()); fPos[i * 3 + 1] = RIM - 0.13; fPos[i * 3 + 2] = lerp(-21.5, 21, rnd()); fSeed[i] = rnd() * 100; }
   const fGeo = new THREE.BufferGeometry(); fGeo.setAttribute("position", new THREE.BufferAttribute(fPos, 3));
   const dot = canvasTex(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, "rgba(255,255,255,0.9)"); r.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
-  const pf = new THREE.BufferGeometry(); pf.setAttribute("position", new THREE.Float32BufferAttribute(pondFroth, 3));
-  scene.add(new THREE.Points(pf, new THREE.PointsMaterial({ map: dot, size: 3.2, transparent: true, opacity: 0.85, depthWrite: false, color: 0xf2f0e6 })));
+  const pondFrothPts = new THREE.Points(pondFrothGeo, new THREE.PointsMaterial({ map: dot, size: 1.8, transparent: true, opacity: 0.95, depthWrite: false, color: 0xf4f6f0 }));
+  pondFrothPts.frustumCulled = false; scene.add(pondFrothPts);
   const froth = new THREE.Points(fGeo, new THREE.PointsMaterial({ map: dot, size: 0.11, transparent: true, opacity: 0.8, depthWrite: false, color: 0xe8e6dc }));
   inside.add(froth);
 
@@ -380,14 +359,73 @@ export function build3D(renderer, canvas, mobile, opts = {}) {
     g.fillStyle = "rgba(255,255,255,0.85)"; g.beginPath(); g.arc(871, cy - 21, 4.4, 0, 6.2832); g.fill();
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
   })();
-  const NL = mobile ? 120 : 240;
+  // a grown whiteleg shrimp, side view, head to the right: glassy grey body with faint bands, rostrum, black eye,
+  // long whip antennae sweeping back, walking legs, swimmerets, and a fan tail
+  const adultSprite = (() => {
+    const W = 1024, H = 400, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+    const cy = 190;
+    const P = (t) => [800 - t * 600 - Math.pow(t, 3) * 50, cy + 10 - Math.sin(Math.PI * Math.min(1, t * 1.1)) * 50 + Math.pow(t, 2.2) * 80];
+    const R = (t) => (t < 0.3 ? 38 + t * 120 : 74 * Math.pow(1 - (t - 0.3) / 0.7, 0.7) + 13);   // carapace tapers to the rostrum, deepest behind it, abdomen tapers to the fan
+    g.lineCap = "round"; g.lineJoin = "round";
+    // antennae: two long whips back over the body, two short antennules forward
+    g.strokeStyle = "rgba(210,225,222,0.55)"; g.lineWidth = 2.4;
+    [[-30, 0], [-18, 60]].forEach(([dy, extra]) => { g.beginPath(); g.moveTo(820, cy + dy); g.bezierCurveTo(930, cy - 90 + dy, 700, cy - 150 + dy, 120 - extra, cy - 110 + dy * 0.5); g.stroke(); });
+    g.lineWidth = 2; [[-26, 80], [-14, 70]].forEach(([dy, len]) => { g.beginPath(); g.moveTo(830, cy + dy); g.quadraticCurveTo(900, cy + dy - 30, 830 + len * 1.4, cy + dy - 50); g.stroke(); });
+    // walking legs and swimmerets
+    g.strokeStyle = "rgba(205,220,218,0.6)"; g.lineWidth = 3;
+    for (let i = 0; i < 5; i++) { const t = 0.04 + i * 0.055, [x, y] = P(t); g.beginPath(); g.moveTo(x, y + R(t) * 0.7); g.quadraticCurveTo(x + 14, y + 70, x - 4 - i * 4, y + 104); g.stroke(); }
+    g.lineWidth = 4;
+    for (let i = 0; i < 5; i++) { const t = 0.38 + i * 0.1, [x, y] = P(t); g.beginPath(); g.moveTo(x, y + R(t) * 0.85); g.quadraticCurveTo(x - 6, y + R(t) + 22, x - 18, y + R(t) + 34); g.stroke(); }
+    // tail fan: a pointed telson between two pairs of broad leaf-shaped uropods, edges a little darker
+    const [tx, ty] = P(1);
+    [[-0.8, 140, 40], [-0.32, 156, 44], [0.12, 150, 26], [0.56, 134, 40]].forEach(([a, L, wd]) => {
+      g.save(); g.translate(tx + 4, ty); g.rotate(Math.PI - a);
+      const gr = g.createLinearGradient(0, 0, L, 0); gr.addColorStop(0, "rgba(206,220,218,0.85)"); gr.addColorStop(0.8, "rgba(170,188,192,0.85)"); gr.addColorStop(1, "rgba(96,112,122,0.9)");
+      g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(L * 0.5, -wd, L, -wd * 0.25); g.quadraticCurveTo(L * 1.02, wd * 0.2, L * 0.9, wd * 0.35); g.quadraticCurveTo(L * 0.4, wd * 0.5, 0, 0); g.fill();
+      g.restore();
+    });
+    // body: overlapping discs along the arched spine, glassy with a bright back and shadowed belly
+    for (let i = 0; i <= 160; i++) {
+      const t = i / 160, [x, y] = P(t), r = R(t);
+      const gr = g.createRadialGradient(x, y - r * 0.45, r * 0.08, x, y, r);
+      gr.addColorStop(0, "rgba(246,250,248,0.95)"); gr.addColorStop(0.55, "rgba(196,210,210,0.9)"); gr.addColorStop(1, "rgba(120,138,146,0.92)");
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
+    }
+    // abdominal segment bands (whiteleg shrimp: faint), carapace edge
+    g.lineWidth = 3;
+    for (let i = 0; i < 6; i++) { const t = 0.36 + i * 0.1, [x, y] = P(t), r = R(t); g.strokeStyle = "rgba(90,105,112,0.35)"; g.beginPath(); g.moveTo(x - 4, y - r); g.quadraticCurveTo(x - 14, y, x - 2, y + r * 0.9); g.stroke(); }
+    { const [x, y] = P(0.33); g.strokeStyle = "rgba(100,115,120,0.4)"; g.beginPath(); g.moveTo(x, y - R(0.33)); g.quadraticCurveTo(x - 10, y, x + 6, y + R(0.33) * 0.8); g.stroke(); }
+    // gut line and a few pigment dots
+    g.strokeStyle = "rgba(80,68,52,0.45)"; g.lineWidth = 4; g.beginPath();
+    for (let i = 0; i <= 50; i++) { const t = 0.2 + i * 0.015, [x, y] = P(t); i ? g.lineTo(x, y - R(t) * 0.45) : g.moveTo(x, y - R(t) * 0.45); } g.stroke();
+    // rostrum with teeth, eye on a stalk
+    g.fillStyle = "rgba(200,212,212,0.95)"; g.beginPath(); g.moveTo(790, cy - 44); g.lineTo(930, cy - 70); g.lineTo(800, cy - 22); g.closePath(); g.fill();
+    g.strokeStyle = "rgba(120,135,140,0.7)"; g.lineWidth = 2; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(810 + i * 18, cy - 46 - i * 3.6); g.lineTo(816 + i * 18, cy - 56 - i * 3.6); g.stroke(); }
+    g.fillStyle = "#0d0b0a"; g.beginPath(); g.ellipse(806, cy - 26, 17, 15, 0, 0, 6.2832); g.fill();
+    g.fillStyle = "rgba(255,255,255,0.8)"; g.beginPath(); g.arc(811, cy - 31, 4.5, 0, 6.2832); g.fill();
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+  })();
+  const NL = mobile ? 280 : 560;
   const larvae = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 0.3125), new THREE.MeshBasicMaterial({ map: larvaSprite, transparent: true, depthWrite: false, side: THREE.DoubleSide }), NL);
   larvae.userData.live = true; larvae.frustumCulled = false; inside.add(larvae);
-  const LL = Array.from({ length: NL }, () => {
+  const NA = mobile ? 14 : 22;                                  // the larvae nearest the camera grow into these
+  const adultMat = new THREE.MeshBasicMaterial({ map: adultSprite, transparent: true, depthWrite: false, side: THREE.DoubleSide, opacity: 0 });
+  const adults = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 0.39), adultMat, NA);
+  adultMat.color.setScalar(1.3); adults.userData.live = true; adults.frustumCulled = false; inside.add(adults);
+  const LL = Array.from({ length: NL }, (_, i) => {
+    if (i % 10 < 7) {                                // most of the swarm fills the view where the camera stops under water
+      const d = lerp(0.18, 2.4, Math.pow(rnd(), 1.4)), hz = -6.9 - d, hx = 4.95 + (rnd() - 0.5) * (0.2 + d * (mobile ? 0.5 : 1.1));
+      const hy = lerp(0.14, TK.y - 0.08, rnd());
+      return { x: hx, y: hy, z: hz, hx, hy, hz, a: rnd() * 6.28, v: 0.02 + rnd() * 0.04, ph: rnd() * 6.28, len: 0.05 + rnd() * 0.04, dart: 0 };
+    }
     const t = rnd(), r = 0.12 + Math.pow(rnd(), 0.7) * 0.9, ang = rnd() * 6.28;
     const hx = lerp(4.3, 5.5, t) + Math.cos(ang) * r, hy = Math.min(TK.y - 0.08, Math.max(0.12, lerp(0.75, 0.62, t) + Math.sin(ang) * r * 0.5)), hz = lerp(-5.4, -10.2, t) + (rnd() - 0.5) * 0.8;
     return { x: hx, y: hy, z: hz, hx, hy, hz, a: rnd() * 6.28, v: 0.02 + rnd() * 0.04, ph: rnd() * 6.28, len: 0.055 + rnd() * 0.04, dart: 0 };
   });
+  for (let i = 0; i < Math.min(LL.length, mobile ? 14 : 22); i++) {       // future adults swim a little way ahead of the lens
+    const l = LL[i], t = i / 22;
+    l.hx = l.x = mobile ? lerp(4.7, 5.2, rnd()) : lerp(4.4, 5.6, rnd()); l.hz = l.z = lerp(-7.7, -9.2, t) + (rnd() - 0.5) * 0.3; l.hy = l.y = lerp(0.3, TK.y - 0.12, rnd());
+  }
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), pos = new THREE.Vector3(), scl = new THREE.Vector3(), camL = new THREE.Vector3();
   let grow = 0;
 
@@ -496,6 +534,7 @@ export function build3D(renderer, canvas, mobile, opts = {}) {
   const proj = opts.photos ? makeProjection(renderer, scene, sea, pose, mobile, shedBox) : null;
 
   const render = (jScroll, now, dt) => {
+    pondWater.visible = false; pondFlat.visible = true;
     const j = paced(jScroll);
     sx += (mx - sx) * 0.04; sy += (my - sy) * 0.04;
     pose(camera, j, sx, sy);
@@ -543,11 +582,18 @@ export function build3D(renderer, canvas, mobile, opts = {}) {
       const rightX = Math.cos(yaw), rightZ = -Math.sin(yaw);
       const flip = Math.cos(l.a) * rightX - Math.sin(l.a) * rightZ >= 0 ? 1 : -1;
       q.setFromEuler(new THREE.Euler(0, yaw, Math.sin(tt * (8 + l.dart * 30) + l.ph) * (0.05 + l.dart * 0.2), "YXZ"));
-      const gl = l.len * (1 + grow * 3.2);            // growing, as the scroll runs on
+      const gl = l.len * (1 + grow * 2.4);            // growing, as the scroll runs on
       pos.set(l.x, l.y, l.z); scl.set(gl * flip, gl, gl);
       m4.compose(pos, q, scl); larvae.setMatrixAt(i, m4);
+      if (i < NA) {                                   // the grown shrimp take over the same swimmers
+        const ag = lerp(0.12, 0.34, smooth(band(grow, 0.3, 1))) * (0.85 + (i % 5) * 0.06);
+        scl.set(ag * flip, ag, ag); m4.compose(pos, q, scl); adults.setMatrixAt(i, m4);
+      }
     }
-    larvae.instanceMatrix.needsUpdate = true;
+    larvae.instanceMatrix.needsUpdate = true; adults.instanceMatrix.needsUpdate = true;
+    larvae.material.opacity = 1 - smooth(band(grow, 0.45, 0.85));
+    adultMat.opacity = smooth(band(grow, 0.3, 0.7));
+    bubbles.material.size = 0.02 * (1 + Math.sin(Math.PI * band(grow, 0.15, 0.75)) * 2.2);   // a swell of bubbles as they grow
     camera.near = uw ? 0.012 : 0.08; camera.updateProjectionMatrix();
     if (uw) {
       scene.fog = uwFog;
@@ -560,6 +606,38 @@ export function build3D(renderer, canvas, mobile, opts = {}) {
     } else if (proj && proj.ready()) proj.render(camera, j, now);
     else renderer.render(scene, camera);
   };
+  const PK = [
+    [new THREE.Vector3(60, 110, -40), new THREE.Vector3(0, 0, -330)],
+    [new THREE.Vector3(10, 62, -190), new THREE.Vector3(-40, 0, -380)],
+    [new THREE.Vector3(-40, 30, -300), new THREE.Vector3(-90, 0, -430)],
+    [new THREE.Vector3(-78, 14, -392), new THREE.Vector3(-98, PONDS.y, -452)],
+    [new THREE.Vector3(-92, 7.5, -420), new THREE.Vector3(-98, PONDS.y, -462)],
+  ];
+  const ppc = new THREE.CatmullRomCurve3(PK.map((k) => k[0]), false, "centripetal", 0.5), plc = new THREE.CatmullRomCurve3(PK.map((k) => k[1]), false, "centripetal", 0.5);
+  render.pond = (u, now, dt) => {
+    pondWater.visible = true; pondFlat.visible = false;
+    sx += (mx - sx) * 0.04; sy += (my - sy) * 0.04;
+    const k = smooth(u) * 0.4 + u * 0.6;
+    ppc.getPoint(k, cp); plc.getPoint(k, lp);
+    camera.position.set(cp.x + sx * 3, cp.y - sy * 1.5, cp.z); camera.lookAt(lp); camera.near = 0.3; camera.updateProjectionMatrix();
+    scene.fog.density = 0.0016; renderer.toneMappingExposure = 0.55;
+    const tt = now * 0.001;
+    sea.material.uniforms.time.value = now * 0.0006; pondWater.material.uniforms.time.value = now * 0.0004;
+    // churned water: froth sprays out behind each wheel and fades, over and over
+    let n = 0;
+    for (let a = 0; a < aerators.length; a++) {
+      const [ax, az, ang] = aerators[a], cs = Math.cos(ang), sn = Math.sin(ang);
+      const per = NPF / aerators.length;
+      for (let i = 0; i < per; i++, n++) {
+        const ph = (tt * 0.6 + pfSeed[n]) % 1, along = 0.6 + ph * ph * 9, side = (pfSeed[(n * 7) % NPF] - 0.5) * (3 + ph * 3);
+        pfPos[n * 3] = ax + cs * along - sn * side; pfPos[n * 3 + 1] = PONDS.y + 0.12; pfPos[n * 3 + 2] = az - sn * along - cs * side;
+      }
+    }
+    pondFrothGeo.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+  };
+  // compile every shader now, so the first look at the ponds or the tank does not stall the scroll
+  try { renderer.compile(scene, camera); renderer.compile(uwScene, uwCam); } catch { /* compiles on first use instead */ }
   render.larvae = larvae;
   render.setGrow = (g) => { grow = g; };
   // where (in scroll terms) a moment of the old keyframe timeline now lands, for the captions
@@ -599,9 +677,14 @@ vec4 take(sampler2D ph, sampler2D pp, mat4 vp, vec3 cpos, vec3 P, float inside){
   vec2 e = smoothstep(vec2(0.0), vec2(0.14), uv) * smoothstep(vec2(0.0), vec2(0.14), 1.0 - uv);
   float edge = e.x * e.y;
   if (edge <= 0.0) return vec4(0.0);
-  vec4 S = texture2D(pp, uv);
-  float dP = distance(P, cpos), dS = distance(S.xyz, cpos);
-  float vis = S.w > 0.5 ? 1.0 - smoothstep(0.02, 0.06, (dP - dS) / dP) : 0.0;
+  // can the projector see this point? four taps of its visibility map, so occlusion edges fade instead of stepping
+  float dP = distance(P, cpos), vis = 0.0;
+  vec2 tx = vec2(0.75 / 640.0, 0.75 / 366.0);
+  for (int k = 0; k < 4; k++) {
+    vec4 S = texture2D(pp, uv + tx * vec2(k == 0 || k == 2 ? -1.0 : 1.0, k < 2 ? -1.0 : 1.0));
+    vis += S.w > 0.5 ? 1.0 - smoothstep(0.02, 0.06, (dP - distance(S.xyz, cpos)) / dP) : 0.0;
+  }
+  vis *= 0.25;
   vec3 rgb = texture2D(ph, uv).rgb;
   return vec4(rgb, edge * vis);
 }
@@ -662,7 +745,7 @@ function makeProjection(renderer, scene, sea, pose, mobile, box) {
   const P = PHOTOS.map(([j, inside]) => {
     const cam = new THREE.PerspectiveCamera(48, 1344 / 768, 0.08, 15000);
     cam.updateProjectionMatrix(); pose(cam, j);
-    const rt = floatRT(mobile ? 384 : 640, mobile ? 220 : 366);
+    const rt = floatRT(640, 366);   // what each projector can see: phones need it as sharp as desktops, or thin rims break into steps
     positions(cam, rt);
     const vp = new THREE.Matrix4().multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
     const p = { j, inside, cam, rt, vp, ok: false };
@@ -673,7 +756,8 @@ function makeProjection(renderer, scene, sea, pose, mobile, box) {
   const size = new THREE.Vector2();
   renderer.getDrawingBufferSize(size);
   const colorRT = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: mobile ? 0 : 2 });
-  const posRT = floatRT(Math.ceil(size.x / 2), Math.ceil(size.y / 2));   // positions only steer which photo paints a pixel: half size is plenty
+  const PD = mobile ? 1 : 2;   // positions steer which photo paints a pixel: half size is plenty on big screens, phones need full size for thin rims
+  const posRT = floatRT(Math.ceil(size.x / PD), Math.ceil(size.y / PD));
   const dummy = new THREE.DataTexture(new Float32Array(4), 1, 1, THREE.RGBAFormat, THREE.FloatType); dummy.needsUpdate = true;
   const U = { tColor: { value: colorRT.texture }, tPos: { value: posRT.texture }, exposure: { value: 0.55 }, time: { value: 0 }, wt: { value: new THREE.Vector3() }, side: { value: new THREE.Vector3() }, bmin: { value: box.min }, bmax: { value: box.max }, uWaterY: { value: box.min.y + 1 + 1.25 - 0.08 }, uWaterFade: { value: 1 } };
   for (let i = 0; i < 3; i++) Object.assign(U, { ["ph" + i]: { value: dummy }, ["pp" + i]: { value: dummy }, ["vp" + i]: { value: new THREE.Matrix4() }, ["cp" + i]: { value: new THREE.Vector3() } });
@@ -693,7 +777,7 @@ function makeProjection(renderer, scene, sea, pose, mobile, box) {
     ready: () => P[0].ok,
     render(camera, j, now) {
       renderer.getDrawingBufferSize(size);
-      if (colorRT.width !== size.x || colorRT.height !== size.y) { colorRT.setSize(size.x, size.y); posRT.setSize(Math.ceil(size.x / 2), Math.ceil(size.y / 2)); }
+      if (colorRT.width !== size.x || colorRT.height !== size.y) { colorRT.setSize(size.x, size.y); posRT.setSize(Math.ceil(size.x / PD), Math.ceil(size.y / PD)); }
       renderer.setRenderTarget(colorRT); renderer.render(scene, camera); renderer.setRenderTarget(null);
       positions(camera, posRT);
       // the two photos either side of here, cross-weighted, plus the next one as a quiet fallback for gaps
