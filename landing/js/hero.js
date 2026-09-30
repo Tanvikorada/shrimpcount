@@ -54,7 +54,7 @@ export function initHero({ ScrollTrigger, reduce, fmt }) {
   const markTex = (() => {
     const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
     const halo = g.createRadialGradient(64, 64, 20, 64, 64, 62);
-    halo.addColorStop(0, "rgba(255,106,77,0.28)"); halo.addColorStop(1, "rgba(255,106,77,0)");
+    halo.addColorStop(0, "rgba(31,181,168,0.28)"); halo.addColorStop(1, "rgba(31,181,168,0)");
     g.fillStyle = halo; g.fillRect(0, 0, 128, 128);
     g.strokeStyle = "rgba(240,86,54,0.95)"; g.lineWidth = 5; g.beginPath(); g.arc(64, 64, 34, 0, Math.PI * 2); g.stroke();
     g.fillStyle = "rgba(240,86,54,1)"; g.beginPath(); g.arc(64, 64, 9, 0, Math.PI * 2); g.fill();
@@ -81,7 +81,7 @@ export function initHero({ ScrollTrigger, reduce, fmt }) {
 
   scene.add(new THREE.HemisphereLight(0xe7f3f2, 0x0a1316, 1.6));
   const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(-3, 6, 4); scene.add(sun);
-  const warm = new THREE.PointLight(0xff8a6a, 20, 12); warm.position.set(3.4, 1.4, -2.2); scene.add(warm);
+  const warm = new THREE.PointLight(0x3fd6c6, 20, 12); warm.position.set(3.4, 1.4, -2.2); scene.add(warm);
 
   const HX = (TW - 0.46) / 2, HZ = (TD - 0.46) / 2;
   const L = Array.from({ length: N }, () => {

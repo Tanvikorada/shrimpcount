@@ -147,31 +147,31 @@ function shrimpSprite() {
   const B = (t) => { const u = 1 - t; return [u * u * 250 + 2 * u * t * 150 + t * t * 58, u * u * 92 + 2 * u * t * 18 + t * t * 132]; };
   const rad = (t) => 7 + 25 * Math.pow(1 - t, 0.75);
   // antennae sweep back over the body
-  g.strokeStyle = "rgba(255,196,170,0.55)"; g.lineWidth = 1.4; g.lineCap = "round";
+  g.strokeStyle = "rgba(205,238,232,0.5)"; g.lineWidth = 1.4; g.lineCap = "round";
   [[-10, 60], [-4, 90]].forEach(([dy, reach]) => { g.beginPath(); g.moveTo(262, 84); g.bezierCurveTo(300, 60 + dy, 250, 10 + dy, 262 - reach * 2.2, 26 + dy); g.stroke(); });
   // legs under the carapace and swimmerets under the tail
-  g.strokeStyle = "rgba(255,180,150,0.6)"; g.lineWidth = 2;
+  g.strokeStyle = "rgba(190,228,222,0.55)"; g.lineWidth = 2;
   for (let i = 0; i < 5; i++) { const [x, y] = B(0.06 + i * 0.05); g.beginPath(); g.moveTo(x, y + rad(0.06 + i * 0.05) * 0.7); g.quadraticCurveTo(x - 4, y + 30, x - 12, y + 40); g.stroke(); }
   for (let i = 0; i < 4; i++) { const t = 0.36 + i * 0.1, [x, y] = B(t); g.beginPath(); g.moveTo(x, y + rad(t) * 0.8); g.lineTo(x - 8, y + rad(t) + 14); g.stroke(); }
   // tail fan
   const [tx, ty] = B(1);
-  g.fillStyle = "rgba(255,170,140,0.75)";
+  g.fillStyle = "rgba(180,222,215,0.7)";
   [[-0.5, 34], [0.1, 38], [0.7, 32]].forEach(([a, L]) => { g.beginPath(); g.moveTo(tx, ty); g.lineTo(tx - Math.cos(a + 0.9) * L - 6, ty + Math.sin(a + 0.9) * L); g.lineTo(tx - Math.cos(a + 0.9) * L + 6, ty + Math.sin(a + 0.9) * L); g.closePath(); g.fill(); });
   // body: overlapping discs along the arched spine, lit from above
   for (let i = 0; i <= 120; i++) {
     const t = i / 120, [x, y] = B(t), r = rad(t);
     const gr = g.createRadialGradient(x, y - r * 0.45, r * 0.1, x, y, r);
-    gr.addColorStop(0, "#ffe2d4"); gr.addColorStop(0.55, "#f6a585"); gr.addColorStop(1, "#c8664a");
+    gr.addColorStop(0, "#eefaf8"); gr.addColorStop(0.55, "#a9d8d1"); gr.addColorStop(1, "#5e9790");
     g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
   }
   // segment bands across the abdomen
-  g.strokeStyle = "rgba(150,60,40,0.45)"; g.lineWidth = 1.6;
+  g.strokeStyle = "rgba(40,85,80,0.4)"; g.lineWidth = 1.6;
   for (let i = 0; i < 6; i++) { const t = 0.3 + i * 0.1, [x, y] = B(t), [x2, y2] = B(t + 0.01), a = Math.atan2(y2 - y, x2 - x) + Math.PI / 2, r = rad(t);
     g.beginPath(); g.moveTo(x - Math.cos(a) * r, y - Math.sin(a) * r); g.quadraticCurveTo(x + 5, y, x + Math.cos(a) * r, y + Math.sin(a) * r); g.stroke(); }
   // gut line, rostrum, eye
-  g.strokeStyle = "rgba(120,50,30,0.5)"; g.lineWidth = 2.2; g.beginPath();
+  g.strokeStyle = "rgba(70,55,40,0.5)"; g.lineWidth = 2.2; g.beginPath();
   for (let i = 0; i <= 40; i++) { const t = 0.08 + i * 0.022, [x, y] = B(t); i ? g.lineTo(x, y - rad(t) * 0.35) : g.moveTo(x, y - rad(t) * 0.35); } g.stroke();
-  g.fillStyle = "#f6b49a"; g.beginPath(); g.moveTo(250, 72); g.lineTo(304, 70); g.lineTo(252, 86); g.closePath(); g.fill();
+  g.fillStyle = "#c4e9e3"; g.beginPath(); g.moveTo(250, 72); g.lineTo(304, 70); g.lineTo(252, 86); g.closePath(); g.fill();
   g.fillStyle = "#1a0f0b"; g.beginPath(); g.arc(262, 80, 6.5, 0, 6.2832); g.fill();
   g.fillStyle = "rgba(255,255,255,0.8)"; g.beginPath(); g.arc(264, 78, 1.8, 0, 6.2832); g.fill();
   return c;

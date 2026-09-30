@@ -32,7 +32,7 @@ export function initBreakdown({ ScrollTrigger, reduce, fmt }) {
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: i === 0 ? 1 : 0, depthWrite: !GLOW.has(i), blending: GLOW.has(i) ? THREE.AdditiveBlending : THREE.NormalBlending, side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geo, mat); mesh.renderOrder = i; g.add(mesh);
     // a thin glass edge so each layer reads as a slab; the active one glows coral
-    const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(PW, 0.025, PH)), new THREE.LineBasicMaterial({ color: 0xffc6b0, transparent: true, opacity: 0 }));
+    const edge = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(PW, 0.025, PH)), new THREE.LineBasicMaterial({ color: 0xa6efe6, transparent: true, opacity: 0 }));
     g.add(edge);
     stack.add(g);
     return { g, mat, edge, lift: 0 };
@@ -44,11 +44,11 @@ export function initBreakdown({ ScrollTrigger, reduce, fmt }) {
   const pPos = new Float32Array(NP * 3), pSpd = new Float32Array(NP);
   for (let i = 0; i < NP; i++) { pPos[i * 3] = (Math.random() - 0.5) * PW * 0.9; pPos[i * 3 + 1] = Math.random() * 4; pPos[i * 3 + 2] = (Math.random() - 0.5) * PH * 0.9; pSpd[i] = 0.3 + Math.random() * 0.7; }
   pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
-  const pMat = new THREE.PointsMaterial({ color: 0xff9b7e, size: mobile ? 0.045 : 0.035, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  const pMat = new THREE.PointsMaterial({ color: 0x6fe3d6, size: mobile ? 0.045 : 0.035, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
   stack.add(new THREE.Points(pGeo, pMat));
 
   // a soft glow pool under the stack
-  const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"); const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, "rgba(255,138,106,0.5)"); r.addColorStop(1, "rgba(255,138,106,0)"); g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+  const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"); const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, "rgba(63,214,198,0.5)"); r.addColorStop(1, "rgba(63,214,198,0)"); g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
   const glowGeo = new THREE.PlaneGeometry(10, 10); glowGeo.rotateX(-Math.PI / 2);
   const glow = new THREE.Mesh(glowGeo, new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
   glow.position.y = -0.6; scene.add(glow);
@@ -81,7 +81,7 @@ export function initBreakdown({ ScrollTrigger, reduce, fmt }) {
       const dim = inSteps && i !== active ? (i < active ? 0.45 : 0.3) : 1;
       const keep = i === layers.length - 1 ? 1 : 1 - band(p, 0.76, 0.82);
       L.mat.opacity = appear * keep * lerp(1, dim, open);
-      L.edge.material.color.setHex(i === active && inSteps ? 0xff8a6a : 0xffc6b0);
+      L.edge.material.color.setHex(i === active && inSteps ? 0x3fd6c6 : 0xa6efe6);
       L.edge.material.opacity = appear * open * (0.18 + 0.7 * focus);
     });
 
