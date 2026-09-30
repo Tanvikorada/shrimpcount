@@ -140,6 +140,12 @@
         <video class="uw-bubbles" muted loop playsinline preload="none" data-src="media/bubbles-loop.mp4" aria-hidden="true"></video>
         <img class="film-poster" src="media/farm-poster.jpg" alt="" />
         <video class="film-video" muted playsinline preload="none" aria-hidden="true"></video>
+        <svg class="fx-defs" width="0" height="0" aria-hidden="true" focusable="false">
+          <filter id="ripple" x="-4%" y="-4%" width="108%" height="108%" color-interpolation-filters="sRGB">
+            <feTurbulence id="rip-t" type="fractalNoise" baseFrequency="0.007 0.018" numOctaves="2" seed="7" result="n" />
+            <feDisplacementMap id="rip-d" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </svg>
         <div class="haze" aria-hidden="true"></div>
         <div class="journey-shade"></div>
         <div class="j-cap" data-at="0.04" data-w="0.045"><p class="eyebrow">The journey of one count</p><h2>Hatcheries sit by the sea.</h2></div>

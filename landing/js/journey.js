@@ -26,6 +26,20 @@ export function initJourney({ ScrollTrigger, reduce }) {
   const canvas = section.querySelector("#uw-gl");
   const haze = section.querySelector(".haze");
   const caps = [...section.querySelectorAll(".j-cap")];
+  // kinetic captions: every word gets its own span so words can rise out of a blur one after another
+  caps.forEach((c) => {
+    const walk = (n) => [...n.childNodes].forEach((k) => {
+      if (k.nodeType === 3 && k.textContent.trim()) {
+        const f = document.createDocumentFragment();
+        k.textContent.split(/(\s+)/).forEach((w) => { if (!w) return; if (/^\s+$/.test(w)) f.append(w); else { const s = document.createElement("span"); s.className = "kw"; s.textContent = w; f.append(s); } });
+        k.replaceWith(f);
+      } else if (k.nodeType === 1 && k.tagName !== "BR") walk(k);
+    });
+    walk(c);
+    c._words = [...c.querySelectorAll(".kw")];
+  });
+  // liquid ripple used at every water moment
+  const ripT = document.getElementById("rip-t"), ripD = document.getElementById("rip-d");
   const mobile = window.innerWidth < 760;
 
   // films load as blobs so any frame can be sought instantly, on any host
@@ -100,9 +114,31 @@ export function initJourney({ ScrollTrigger, reduce }) {
     if (dvIn > 0 && prIn < 1) seek(dive, band(J, DIVE0, PRAWNS[0] + 0.02));
     if (prIn > 0 && pondIn < 1) seek(prawns, band(J, PRAWNS[0], PRAWNS[1]));
     if (pondIn > 0) seek(film, band(J, POND, 1));
+    // liquid ripple: breaking the surface, larvae turning into prawns, and surfacing into the pond
+    const rip = Math.max(
+      Math.sin(Math.PI * band(J, DIVE0 - 0.012, DIVE0 + 0.035)),
+      Math.sin(Math.PI * band(J, PRAWNS[0] - 0.02, PRAWNS[0] + 0.035)),
+      Math.sin(Math.PI * band(J, POND - 0.045, POND + 0.02)));
+    const tt = now * 0.001;
+    const rippled = rip > 0.02 ? [dive, prawns, film, canvas] : [];
+    if (rip > 0.02) {
+      ripD.setAttribute("scale", (rip * (mobile ? 38 : 70)).toFixed(1));
+      ripT.setAttribute("baseFrequency", `${(0.006 + 0.0025 * Math.sin(tt * 1.3)).toFixed(4)} ${(0.016 + 0.004 * Math.cos(tt * 0.9)).toFixed(4)}`);
+    }
+    // focus pull: after the splash the camera settles and the larvae come sharp
+    const focus = dvIn > 0 && prIn < 0.5 ? (1 - smooth(band(J, DIVE0 + 0.012, DIVE0 + 0.045))) * 4 * smooth(band(J, DIVE0, DIVE0 + 0.01)) : 0;
+    const base = new Map([[dive, focus > 0.2 ? `blur(${focus.toFixed(1)}px)` : ""], [prawns, prawns.style.filter.replace(/ ?url\(#ripple\)/g, "")], [film, ""], [canvas, canvas.style.filter.replace(/ ?url\(#ripple\)/g, "")]]);
+    base.forEach((f, el) => { el.style.filter = rippled.includes(el) ? `${f} url(#ripple)`.trim() : f; });
     caps.forEach((c) => {
       const o = clamp01((1 - Math.abs(J - Number(c.dataset.at)) / Number(c.dataset.w || 0.06)) * 1.7);
-      c.style.opacity = String(o); c.style.transform = `translateY(${(1 - o) * 30}px)`;
+      c.style.opacity = o > 0.001 ? "1" : "0"; c.style.transform = "";
+      const n = c._words.length;
+      c._words.forEach((w, i) => {
+        const k = smooth(clamp01(o * (1 + n * 0.12) - i * 0.12));    // words arrive one after another
+        w.style.opacity = String(k);
+        w.style.transform = `translateY(${((1 - k) * 0.55).toFixed(3)}em)`;
+        w.style.filter = k < 0.98 ? `blur(${((1 - k) * 10).toFixed(1)}px)` : "";
+      });
     });
   }
   whileVisible(section, frame);
