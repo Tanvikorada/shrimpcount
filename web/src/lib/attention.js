@@ -1,5 +1,6 @@
 import { PARAMS, outOfRange } from './water'
 import { fmtDate } from './format'
+import { t } from './i18n'
 
 const today = () => new Date().toLocaleDateString('en-CA')
 
@@ -8,7 +9,7 @@ export function attention(store) {
   const out = []
   for (const i of store.inventory) {
     if (i.reorderAt !== '' && i.reorderAt != null && Number(i.qty) <= Number(i.reorderAt)) {
-      out.push({ kind: 'stock', title: `${i.name} running low`, sub: `${i.qty} ${i.unit} left · alert at ${i.reorderAt} ${i.unit}`, to: '/inventory' })
+      out.push({ kind: 'stock', title: t('att_stock_low', { name: i.name }), sub: t('att_stock_sub', { qty: i.qty, unit: i.unit, reorder: i.reorderAt }), to: '/inventory' })
     }
   }
   const latest = new Map()
@@ -16,13 +17,13 @@ export function attention(store) {
   for (const [tank, w] of latest) {
     for (const p of PARAMS) {
       if (outOfRange(store.settings, p.key, w[p.key])) {
-        out.push({ kind: 'water', title: `${tank ? `Tank ${tank}` : 'Tank'} ${p.label} is ${w[p.key]}`, sub: 'Outside your set range · latest reading', to: '/water' })
+        out.push({ kind: 'water', title: t('att_water_title', { tank: tank ? t('att_water_tank', { tank }) : t('tank_word'), param: t(p.labelKey), v: w[p.key] }), sub: t('att_water_sub'), to: '/water' })
       }
     }
   }
-  const t = today()
+  const now = today()
   for (const k of store.tasks) {
-    if (!k.done && k.due && k.due < t) out.push({ kind: 'task', title: `${k.title} is overdue`, sub: `${k.assignee ? `${k.assignee} · ` : ''}due ${fmtDate(k.due)}`, to: '/tasks' })
+    if (!k.done && k.due && k.due < now) out.push({ kind: 'task', title: t('att_task_title', { title: k.title }), sub: `${k.assignee ? `${k.assignee} · ` : ''}${t('tsk_due', { date: fmtDate(k.due) })}`, to: '/tasks' })
   }
   return out
 }

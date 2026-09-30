@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, Empty, Button, Field, PageHeader, Badge } from '../components/ui'
 import { fmtDate } from '../lib/format'
 import { fitLine, daysToTarget } from '../lib/growth'
+import { t } from '../lib/i18n'
 
 const DAY = 86400000
 
@@ -12,7 +13,7 @@ export default function Growth({ store, go }) {
   const [abw, setAbw] = useState('')
   const [target, setTarget] = useState('')
   const batch = store.batches.find((b) => b.id === batchId) || store.batches[0]
-  if (!batch) return <><PageHeader title="Growth" onBack={() => go('/more')} /><Empty title="No batches yet" body="Create a batch first, then log body-weight samples against it." action={<Button onClick={() => go('/batches/new')}>New batch</Button>} /></>
+  if (!batch) return <><PageHeader title={t('gr_title')} onBack={() => go('/more')} /><Empty title={t('gr_empty_title')} body={t('gr_empty_body')} action={<Button onClick={() => go('/batches/new')}>{t('home_new_batch')}</Button>} /></>
 
   const rows = store.growth.filter((g) => g.batchId === batch.id).slice().sort((a, b) => (a.date < b.date ? -1 : 1))
   const t0 = rows.length ? new Date(rows[0].date).getTime() : 0
@@ -36,36 +37,36 @@ export default function Growth({ store, go }) {
 
   return (
     <>
-      <PageHeader title="Growth" sub="Average body weight" onBack={() => go('/more')} right={<Button onClick={() => setOpen(!open)}>{open ? 'Cancel' : 'Log weight'}</Button>} />
+      <PageHeader title={t('gr_title')} sub={t('gr_sub')} onBack={() => go('/more')} right={<Button onClick={() => setOpen(!open)}>{open ? t('cancel') : t('gr_log')}</Button>} />
       <label className="mb-3 block">
-        <span className="text-sm font-medium text-slate-700">Batch</span>
+        <span className="text-sm font-medium text-slate-700">{t('fl_batch')}</span>
         <select value={batch.id} onChange={(e) => setBatchId(e.target.value)} className="mt-1 w-full rounded-xl ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-teal-600 bg-surface px-3.5 py-2.5 text-base">
           {store.batches.map((b) => <option key={b.id} value={b.id}>{b.code}{b.plStage ? ` (${b.plStage})` : ''}</option>)}
         </select>
       </label>
       {open && (
         <form onSubmit={submit} className="mb-4 flex items-end gap-3 rounded-2xl border border-slate-200 bg-surface p-4">
-          <div className="flex-1"><Field label="Average body weight (g)" type="number" step="any" inputMode="decimal" value={abw} onChange={(e) => setAbw(e.target.value)} /></div>
-          <Button className="min-h-12">Save</Button>
+          <div className="flex-1"><Field label={t('gr_abw_label')} type="number" step="any" inputMode="decimal" value={abw} onChange={(e) => setAbw(e.target.value)} /></div>
+          <Button className="min-h-12">{t('save')}</Button>
         </form>
       )}
 
       <Card className="mb-4 p-4">
-        <Field label="Target weight (g)" type="number" step="any" inputMode="decimal" value={target} onChange={(e) => setTarget(e.target.value)} placeholder="e.g. 20" />
+        <Field label={t('gr_target_label')} type="number" step="any" inputMode="decimal" value={target} onChange={(e) => setTarget(e.target.value)} placeholder={t('gr_target_ph')} />
         {rows.length < 3 ? (
-          <p className="mt-3 text-sm text-slate-500">Log at least 3 weight samples to see a projection. {rows.length} so far.</p>
+          <p className="mt-3 text-sm text-slate-500">{t('gr_need_samples', { n: rows.length })}</p>
         ) : (
           <div className="mt-3">
-            <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Average body weight over time">
-              {tgt > 0 && <line x1="0" x2={W} y1={y(tgt)} y2={y(tgt)} stroke="#c2410c" strokeDasharray="4 4" />}
+            <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={t('gr_chart_aria')}>
+              {tgt > 0 && <line x1="0" x2={W} y1={y(tgt)} y2={y(tgt)} stroke="var(--color-coral-700)" strokeDasharray="4 4" />}
               {line && <line x1={x(0)} x2={x(maxDay)} y1={y(line.intercept)} y2={y(line.intercept + line.slope * maxDay)} stroke="var(--color-chart)" strokeOpacity="0.4" strokeWidth="2" />}
               {points.map((p, i) => <circle key={i} cx={x(p.day)} cy={y(p.w)} r="4.5" fill="var(--color-chart)" />)}
             </svg>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-              {line && <Badge tone="teal">{line.slope.toFixed(2)} g per day</Badge>}
-              {tgt > 0 && (days == null ? <Badge>No projection</Badge> : days === 0 ? <Badge tone="teal">Target reached on this trend</Badge> : <Badge tone="amber">About {days} more day{days === 1 ? '' : 's'} to {tgt} g</Badge>)}
+              {line && <Badge tone="teal">{t('gr_rate', { n: line.slope.toFixed(2) })}</Badge>}
+              {tgt > 0 && (days == null ? <Badge>{t('gr_no_projection')}</Badge> : days === 0 ? <Badge tone="teal">{t('gr_target_reached')}</Badge> : <Badge tone="amber">{t('gr_days_more', { n: days, t: tgt })}</Badge>)}
             </div>
-            <p className="mt-2 text-xs text-slate-500">A straight line through your samples. Real growth slows or speeds with feed, water and density, so check against fresh samples.</p>
+            <p className="mt-2 text-xs text-slate-500">{t('gr_trend_note')}</p>
           </div>
         )}
       </Card>
@@ -75,7 +76,7 @@ export default function Growth({ store, go }) {
           {rows.slice().reverse().map((g) => (
             <div key={g.id} className="flex items-center justify-between py-3">
               <div><span className="text-[0.9375rem] font-semibold">{g.abw} g</span> <span className="text-[0.8125rem] text-slate-500">· {fmtDate(g.date)}</span></div>
-              <button className="text-xs text-red-700" aria-label="Delete weight" onClick={() => confirm('Delete this weight?') && store.removeItem('growth', g.id)}>Delete</button>
+              <button className="min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label={t('gr_delete_aria')} onClick={() => confirm(t('gr_delete_confirm')) && store.removeItem('growth', g.id)}>{t('delete')}</button>
             </div>
           ))}
         </Card>

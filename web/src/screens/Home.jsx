@@ -16,7 +16,7 @@ import { useCloud } from '../lib/cloud'
 const KIND = {
   stock: { Icon: Box, tone: 'bg-amber-100 text-amber-900' },
   water: { Icon: Drop, tone: 'bg-amber-100 text-amber-900' },
-  task: { Icon: TasksIcon, tone: 'bg-red-100 text-red-900' },
+  task: { Icon: TasksIcon, tone: 'bg-red-50 text-red-900' },
 }
 
 const Section = ({ title, action, children }) => (
@@ -143,7 +143,7 @@ export default function Home({ store, go, openLang }) {
               const b = batches.find((x) => x.id === s.batchId)
               return (
                 <div key={s.id} className="flex min-h-[4.25rem] items-center gap-3 py-2.5">
-                  {s.thumb ? <img src={s.thumb} alt="" className="h-12 w-12 rounded-xl object-cover" /> : <div className="h-12 w-12 rounded-xl bg-slate-100" />}
+                  {s.thumb ? <img src={s.thumb} alt="" className="h-12 w-12 rounded-xl object-cover" /> : <div className="h-12 w-12 rounded-xl bg-slate-200" />}
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[1rem] font-semibold text-slate-900">{b?.code || '—'}</div>
                     <div className="text-[0.8125rem] text-slate-500">{fmtTime(s.timestamp)}{s.species ? ` · ${s.species}` : ''}</div>

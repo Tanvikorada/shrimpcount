@@ -60,7 +60,7 @@ export default function BatchDetail({ id, store, go }) {
             const photos = s.trayId ? list.filter((x) => x.trayId === s.trayId).length : 1
             return (
               <div key={s.id} className="flex min-h-[4.5rem] items-center gap-3 p-3">
-                {s.thumb ? <img src={s.thumb} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" /> : <div className="h-14 w-14 shrink-0 rounded-xl bg-slate-100" />}
+                {s.thumb ? <img src={s.thumb} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" /> : <div className="h-14 w-14 shrink-0 rounded-xl bg-slate-200" />}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[1.375rem] font-bold tabular-nums tracking-tight text-slate-900">{fmt(s.count)}</span>

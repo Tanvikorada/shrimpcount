@@ -63,7 +63,7 @@ export default function BatchLog({ batch, events, store }) {
                 {ev.text && <div className="text-slate-600">{ev.text}</div>}
                 <div className="text-xs text-slate-500">{fmtDate(ev.timestamp)} · {fmtTime(ev.timestamp)}</div>
               </div>
-              <button className="text-xs text-red-700" aria-label="Delete entry" onClick={() => confirm('Delete this entry?') && store.deleteEvent(ev.id)}>Delete</button>
+              <button className="min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label="Delete entry" onClick={() => confirm('Delete this entry?') && store.deleteEvent(ev.id)}>Delete</button>
             </div>
           ))}
         </Card>

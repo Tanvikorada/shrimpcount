@@ -36,8 +36,8 @@ export default function Report({ id, store, go }) {
         <DocHeader label="Postlarvae count report" name={name} number={number} date={issued} />
 
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-b border-slate-200 py-4 text-sm sm:grid-cols-3">
-          {[['Batch', batch.code], ['Tank', batch.tank || '–'], ['PL stage', batch.plStage || '–'], ['Shrimp type', batch.species || '–'],
-            ['Spawn date', batch.spawnDate ? docDate(batch.spawnDate) : '–'], ['Counted by', store.settings.operator || '–']].map(([k, v]) => (
+          {[[t('fl_batch'), batch.code], [t('tank_word'), batch.tank || '–'], [t('fl_pl_stage'), batch.plStage || '–'], [t('fl_shrimp_type'), batch.species || '–'],
+            [t('fl_spawn_date'), batch.spawnDate ? docDate(batch.spawnDate) : '–'], [t('fl_counted_by'), store.settings.operator || '–']].map(([k, v]) => (
             <div key={k}><dt className="text-xs text-slate-500">{k}</dt><dd className="font-semibold text-slate-900">{v}</dd></div>
           ))}
         </dl>

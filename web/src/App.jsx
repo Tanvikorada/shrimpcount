@@ -56,7 +56,12 @@ export default function App() {
   useEffect(() => { document.documentElement.lang = store.settings.language || detectLang() }, [store.settings.language])
   useEffect(() => {
     let timer
-    const on = (e) => { setToast(e.detail); clearTimeout(timer); timer = setTimeout(() => setToast(''), 2600) }
+    const on = (e) => {
+      const d = typeof e.detail === 'string' ? { text: e.detail, tone: 'ok' } : e.detail
+      setToast(d)
+      clearTimeout(timer)
+      timer = setTimeout(() => setToast(''), d.tone === 'error' ? 4200 : 2600)
+    }
     window.addEventListener('sc-toast', on)
     return () => { window.removeEventListener('sc-toast', on); clearTimeout(timer) }
   }, [])
@@ -161,8 +166,11 @@ export default function App() {
       )}
       <main key={route} className="page-in mx-auto max-w-2xl px-4 pb-32 pt-[max(1.25rem,env(safe-area-inset-top))]">{view}</main>
       {toast && (
-        <div role="status" className="page-in fixed inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-50 mx-auto flex w-fit max-w-[92vw] items-center gap-2.5 rounded-xl bg-slate-900 px-4 py-3 text-[0.9375rem] font-medium text-on-accent">
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-good-500"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg></span>{toast}
+        <div role={toast.tone === 'error' ? 'alert' : 'status'} className="page-in fixed inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-50 mx-auto flex w-fit max-w-[92vw] items-center gap-2.5 rounded-xl bg-slate-900 px-4 py-3 text-[0.9375rem] font-medium text-on-accent">
+          {toast.tone === 'error'
+            ? <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-coral-600"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 8v5M12 16.2v.2" /></svg></span>
+            : <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-good-500"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg></span>}
+          {toast.text}
         </div>
       )}
       {(firstRun || langOpen) && (

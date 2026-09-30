@@ -65,7 +65,7 @@ export default function Prices({ store, go }) {
             {rows.map((r) => (
               <div key={r.id} className="flex items-center justify-between py-3">
                 <div><div className="text-[0.9375rem] font-semibold">Count {r.size} · {money(r.price)}/kg</div><div className="text-[0.8125rem] text-slate-500">{fmtDate(r.date)}{r.source ? ` · ${r.source}` : ''}</div></div>
-                <button className="text-xs text-red-700" aria-label="Delete price" onClick={() => confirm('Delete this price?') && store.removeItem('prices', r.id)}>Delete</button>
+                <button className="min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label="Delete price" onClick={() => confirm('Delete this price?') && store.removeItem('prices', r.id)}>Delete</button>
               </div>
             ))}
           </Card>

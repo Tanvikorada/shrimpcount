@@ -231,11 +231,18 @@ export default function Count({ batchId, store, go }) {
   }
 
   async function save(next) {
-    const thumb = await makeThumb(url)
     const trayId = sameTray && lastTrayByBatch[batchId] ? lastTrayByBatch[batchId] : crypto.randomUUID()
     try { localStorage.setItem('shrimpcount.species', species) } catch { /* ignore */ }
     const num = (v) => (v !== '' && Number.isFinite(Number(v)) && Number(v) > 0 ? Number(v) : null)
-    const row = store.addSample({ batchId, trayId, count, predicted: baseline, engine, method, notes, thumb, aiPending: offline, species, larvaSize: larvaUsed, added: edits.added, removed: edits.removed, manualCount: num(manualCount), otherCount: num(otherCount) })
+    let row
+    try {
+      const thumb = await makeThumb(url)
+      row = store.addSample({ batchId, trayId, count, predicted: baseline, engine, method, notes, thumb, aiPending: offline, species, larvaSize: larvaUsed, added: edits.added, removed: edits.removed, manualCount: num(manualCount), otherCount: num(otherCount) })
+    } catch {
+      // the photo and every mark are still on screen untouched - the operator can just try again
+      window.dispatchEvent(new CustomEvent('sc-toast', { detail: { text: t('save_failed_toast'), tone: 'error' } }))
+      return
+    }
     // keep the marked photo with a caption bar, so the report can show a customer exactly what was counted
     try {
       const blob = await renderEvidence({

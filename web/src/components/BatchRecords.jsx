@@ -64,7 +64,7 @@ export function QualityChecks({ batch, store }) {
             <div key={q.id} className="py-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold">{fmtDate(q.date)}</span>
-                <button className="text-xs text-red-700" aria-label="Delete check" onClick={() => confirm('Delete this check?') && store.removeItem('quality', q.id)}>Delete</button>
+                <button className="min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label="Delete check" onClick={() => confirm('Delete this check?') && store.removeItem('quality', q.id)}>Delete</button>
               </div>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {QUALITY_FIELDS.filter(([k]) => q[k] !== '' && q[k] != null).map(([k, l]) => <Badge key={k}>{l} {q[k]}%</Badge>)}
@@ -126,7 +126,7 @@ export function DiseaseTests({ batch, store }) {
                 <div className="flex items-center gap-2 text-[0.9375rem] font-semibold">{t.test}<Badge tone={RESULT_TONE[t.result]}>{t.result}</Badge></div>
                 <div className="text-[0.8125rem] text-slate-500">{[t.lab, t.sampleDate && fmtDate(t.sampleDate), t.ref && `ref ${t.ref}`].filter(Boolean).join(' · ') || 'No details'}</div>
               </div>
-              <button className="text-xs text-red-700" aria-label="Delete test" onClick={() => confirm('Delete this test?') && store.removeItem('tests', t.id)}>Delete</button>
+              <button className="min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label="Delete test" onClick={() => confirm('Delete this test?') && store.removeItem('tests', t.id)}>Delete</button>
             </div>
           ))}
         </Card>
