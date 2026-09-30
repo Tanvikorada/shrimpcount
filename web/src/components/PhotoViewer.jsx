@@ -99,8 +99,9 @@ export default function PhotoViewer({ src, width, height, alt = '', maxVh = 58, 
     <div className="relative">
       <div ref={box} className="relative w-full select-none overflow-hidden bg-black" style={{ height: H, touchAction: 'none' }}
         onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onWheel={onWheel} onClickCapture={onClickCapture}>
-        <div className="absolute" style={{ width: fitW, height: fitH, left: (W - fitW) / 2, top: (H - fitH) / 2, transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})`, transformOrigin: 'center', willChange: 'transform' }}>
-          <img src={src} alt={alt} draggable={false} className="block h-full w-full" />
+        {/* zoom by laying the photo out bigger (not by scaling a flat picture), so it stays sharp at every zoom */}
+        <div className="absolute" style={{ width: fitW * view.k, height: fitH * view.k, left: (W - fitW * view.k) / 2, top: (H - fitH * view.k) / 2, transform: `translate(${view.x}px, ${view.y}px)` }}>
+          <img src={src} alt={alt} draggable={false} decoding="async" className="block h-full w-full" style={{ imageRendering: 'auto' }} />
           {children}
         </div>
       </div>

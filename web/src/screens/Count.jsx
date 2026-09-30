@@ -32,6 +32,7 @@ export default function Count({ batchId, store, go }) {
   const [file, setFile] = useState(null)
   const [url, setUrl] = useState(null)
   const [size, setSize] = useState({ width: 1, height: 1 })
+  const [showMarks, setShowMarks] = useState(true)
   const [dets, setDets] = useState([])
   const [predicted, setPredicted] = useState(null)
   const [engine, setEngine] = useState(null)
@@ -381,21 +382,28 @@ export default function Count({ batchId, store, go }) {
           </div>
           <div className="shrink-0">
             {/* the whole photo fits in view; pinch, drag, double-tap or the buttons to look closely */}
-            <PhotoViewer src={url} width={size.width} height={size.height} alt="Sample tray" maxVh={40}>
+            <div className="relative">
+            <PhotoViewer src={url} width={size.width} height={size.height} alt="Sample tray" maxVh={window.innerWidth > 900 ? 56 : 42}>
               <svg ref={svgRef} viewBox={`0 0 ${size.width} ${size.height}`} onClick={onTap} onPointerMove={onDragMove} onPointerUp={onDragEnd}
                 className={`absolute inset-0 h-full w-full ${mode === 'add' && !editTray ? 'cursor-crosshair' : ''}`}>
                 {dets.map((d, i) => {
                   const hit = Math.max(d.r, r)               // easy to tap, even though the visible mark is small
-                  const dot = Math.max(hit * 0.32, size.width / 260)
+                  // a thin ring around each larva's head with a small centre dot: the larva stays visible inside the mark
+                  const ring = Math.max(hit * 0.72, size.width / 220), sw = Math.max(0.8, size.width / 1500)
+                  const col = d.added ? '#f5b400' : '#ff5a36'
                   return inTray[i] ? (
-                    <g key={i} onClick={(ev) => toggle(i, ev)} style={{ cursor: 'pointer' }}>
+                    <g key={i} onClick={(ev) => toggle(i, ev)} style={{ cursor: 'pointer' }} opacity={showMarks ? 1 : 0}>
                       <circle cx={d.cx} cy={d.cy} r={hit} fill="transparent" />
                       {d.removed
-                        ? <circle cx={d.cx} cy={d.cy} r={dot * 0.85} fill="none" stroke="#8e999c" strokeWidth={Math.max(1.5, size.width / 900)} strokeDasharray="3 2.5" />
-                        : <circle cx={d.cx} cy={d.cy} r={dot} fill={d.added ? '#e0a100' : '#e4572e'} stroke="rgba(255,255,255,0.9)" strokeWidth={Math.max(1, size.width / 1000)} />}
+                        ? <circle cx={d.cx} cy={d.cy} r={ring} fill="none" stroke="#b8c2c5" strokeWidth={sw} strokeDasharray={`${sw * 2.5} ${sw * 2}`} />
+                        : <>
+                            <circle cx={d.cx} cy={d.cy} r={ring} fill="none" stroke="rgba(0,0,0,0.3)" strokeWidth={sw * 2.2} />
+                            <circle cx={d.cx} cy={d.cy} r={ring} fill="none" stroke={col} strokeWidth={sw * 1.4} />
+                            <circle cx={d.cx} cy={d.cy} r={sw * 0.9} fill={col} />
+                          </>}
                     </g>
                   ) : (
-                    <circle key={i} cx={d.cx} cy={d.cy} r={dot * 0.7} fill="rgba(255,255,255,0.5)" pointerEvents="none" />
+                    <circle key={i} cx={d.cx} cy={d.cy} r={ring * 0.6} fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth={sw} pointerEvents="none" opacity={showMarks ? 1 : 0} />
                   )
                 })}
                 {trayPx && (
@@ -410,6 +418,12 @@ export default function Count({ batchId, store, go }) {
                 ))}
               </svg>
             </PhotoViewer>
+            {/* see the photo without marks, to check the larvae underneath */}
+            <button type="button" onClick={() => setShowMarks((v) => !v)} aria-pressed={!showMarks}
+              className="absolute bottom-3 right-3 rounded-full bg-black/60 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur active:bg-black/80">
+              {showMarks ? 'Hide marks' : 'Show marks'}
+            </button>
+            </div>
             <p className="py-1.5 text-center text-xs text-white/60">{t('zoom_hint')}</p>
           </div>
           <div className="flex min-h-0 flex-1 flex-col rounded-t-2xl bg-slate-100">

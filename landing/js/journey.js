@@ -43,7 +43,7 @@ export function initJourney({ ScrollTrigger, reduce }) {
   const s0 = r3 ? r3.scrollFor(DOOR_J) : 0;
   const jAt = (jOld) => (r3 ? lerp(SHED[0], SHED[1], (r3.scrollFor(jOld) - s0) / (1 - s0)) : 0);
   const DIVE = jAt(0.89);
-  if (r3) [[2, 0.6], [3, 0.72], [4, 0.955]].forEach(([i, j]) => { if (caps[i]) caps[i].dataset.at = String(jAt(j)); });
+  if (r3) [[2, 0.655], [3, 0.74], [4, 0.955]].forEach(([i, j]) => { if (caps[i]) caps[i].dataset.at = String(jAt(j)); });
   if (caps[5]) caps[5].dataset.at = "0.535";
   // each caption gets a fade that fits between its neighbours, so two never show at once
   { const at = caps.map((c) => Number(c.dataset.at));
