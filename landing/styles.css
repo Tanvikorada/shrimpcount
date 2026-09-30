@@ -180,8 +180,9 @@ html:not([lang="en"]) h1, html:not([lang="en"]) h2 { letter-spacing: 0; line-hei
 /* JOURNEY: sea to shed to sample bowl, then the pond film */
 .journey { position: relative; height: 1250vh; }
 .journey-stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; background: #0B0E10; }
-.journey .hatch-poster, .journey .hatch-video, .journey .uw-bubbles, .journey .uw-prawns { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.journey .hatch-poster, .journey .hatch-video, .journey .uw-bubbles, .journey .uw-prawns, .journey .uw-dive { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 #uw-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; }
+.journey .uw-dive { opacity: 0; }
 .journey .uw-prawns { opacity: 0; will-change: transform, opacity; }
 .journey .uw-bubbles { opacity: 0; mix-blend-mode: screen; pointer-events: none; filter: saturate(.7) sepia(.25) hue-rotate(40deg); }
 .journey .film-poster, .journey .film-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
@@ -315,7 +316,7 @@ html:not([lang="en"]) h1, html:not([lang="en"]) h2 { letter-spacing: 0; line-hei
   .hero, .inside, .journey { height: auto; }
   .hero-stage, .inside-stage, .journey-stage { position: relative; height: 100dvh; }
   .hand, .vf { display: none; }
-  .journey .film-video, .journey .hatch-video, #uw-gl, .journey .uw-bubbles, .journey .uw-prawns, .j-cap:not(:last-of-type) { display: none; }
+  .journey .film-video, .journey .hatch-video, #uw-gl, .journey .uw-bubbles, .journey .uw-prawns, .journey .uw-dive, .j-cap:not(:last-of-type) { display: none; }
   .journey .film-poster, .j-cap:last-of-type { opacity: 1; transform: none; }
   .steps, .inside-result { position: static; opacity: 1; translate: none; margin: 16px auto; }
   .hero-hint i, .eyebrow .dot, .price-border { animation: none; }
