@@ -22,7 +22,7 @@ export function initBreakdown({ ScrollTrigger, reduce, fmt }) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-  const PW = 4, PH = 4 * 1901 / 2400;         // layer photos are 2400 x 1901
+  const PW = 4, PH = 4 * 896 / 1200;
   const stack = new THREE.Group(); scene.add(stack);
   const loader = new THREE.TextureLoader();
   const layers = FILES.map((f, i) => {
