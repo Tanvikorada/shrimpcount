@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+@theme {
+  /* one clean sans, like the phone's own apps: San Francisco on iPhone, Inter elsewhere */
+  --font-sans: "Satoshi", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Tamil", "Nirmala UI", system-ui, sans-serif;
+  --font-display: "Cabinet Grotesk", "Satoshi", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Tamil", "Nirmala UI", system-ui, sans-serif;
+
+  /* Ink on paper: near-black, cool greys, hairlines. One accent colour, used in small doses. */
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f4f5f6;
+  --color-slate-200: #e6e8ea;
+  --color-slate-300: #d3d6da;
+  --color-slate-400: #5d626a;
+  --color-slate-500: #4e535a;
+  --color-slate-600: #3f444b;
+  --color-slate-700: #2c3037;
+  --color-slate-800: #1e2126;
+  --color-slate-900: #16181c;
+
+  /* every action is ink (the token keeps its old name, "teal") */
+  --color-teal-50: #f4f5f6;
+  --color-teal-100: #e8eaec;
+  --color-teal-600: #2c3037;
+  --color-teal-700: #16181c;
+  --color-teal-800: #0f1114;
+  --color-teal-900: #0a0b0d;
+  --color-teal-950: #050506;
+  --color-aqua-400: #1aa3b8;
+  --color-ocean-700: #0b4a73;
+  --color-good-500: #1f9d63;
+  --color-good-100: #e3f4ea;
+  /* small radii: precise, not bubbly */
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.75rem;
+  --color-coral-600: #e4572e;
+  --color-coral-700: #c2410c;
+  /* tokens the dark theme needs; these light values are what prints */
+  --color-surface: #ffffff;
+  --color-on-accent: #ffffff;
+  --color-chart: #0f5c63;
+  --color-chart-band: #dcebea;
+}
+
+/* ShrimpCount premium: the same dark sea-glass and shrimp-coral as the website. Screen only, so reports still print on white. */
+@media screen {
+  :root {
+    --color-surface: #13171A;
+    --color-on-accent: #160C08;
+    --color-chart: #FF8A6A;
+    --color-chart-band: rgb(255 138 106 / 0.14);
+    /* the grey scale runs the other way: "900" is now the brightest ink */
+    --color-slate-50: #0C0F11;
+    --color-slate-100: #101416;
+    --color-slate-200: #1C2226;
+    --color-slate-300: #2A3237;
+    --color-slate-400: #7E878D;
+    --color-slate-500: #98A1A7;
+    --color-slate-600: #B5BCC1;
+    --color-slate-700: #D2D7DA;
+    --color-slate-800: #E5E8E9;
+    --color-slate-900: #F3F2ED;
+    /* actions are coral */
+    --color-teal-50: #26170F;
+    --color-teal-100: #36200F;
+    --color-teal-600: #FF8A6A;
+    --color-teal-700: #FF8A6A;
+    --color-teal-800: #FFA187;
+    --color-teal-900: #FFB9A5;
+    --color-teal-950: #FFD6CA;
+    --color-aqua-400: #FF8A6A;
+    --color-good-500: #3DD68C;
+    --color-good-100: #0E2A1D;
+    --color-red-50: #2B1315;
+    --color-red-200: #5A2328;
+    --color-red-700: #FF8E86;
+    --color-red-900: #FFB8B2;
+    --color-amber-50: #2A2112;
+    --color-amber-100: #3A2D14;
+    --color-amber-500: #F5B942;
+    --color-amber-600: #F5B942;
+    --color-amber-700: #FFCB6B;
+    --color-amber-800: #FFD68A;
+    --color-amber-900: #FFE2A8;
+    --radius-2xl: 0.9rem;
+    --radius-3xl: 1.15rem;
+  }
+  html, body { background: #0B0E10 !important; color: #F3F2ED; }
+  :focus-visible { outline-color: #FF8A6A; }
+  /* cards get a hairline of light instead of a shadow */
+  .bg-surface { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04); }
+}
+
+/* text size: the whole app scales with this (Settings, or the Aa button on Home) */
+html { font-size: 18px; }
+html[data-text="normal"] { font-size: 16px; }
+html[data-text="large"] { font-size: 18px; }
+html[data-text="xl"] { font-size: 21px; }
+
+html {
+  overscroll-behavior: none;               /* no pull-to-refresh or rubber-band jumps in any direction */
+  -webkit-text-size-adjust: 100%;
+  background: #f4f5f6;
+  scrollbar-width: none;                   /* no visible scrollbar chrome: Firefox */
+}
+html::-webkit-scrollbar { display: none; } /* no visible scrollbar chrome: Chrome/Safari/WebView */
+
+/* no scrollbar chrome anywhere in the app, on any scrolling panel - phones don't show one either */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;              /* no double-tap zoom delay on buttons */
+  letter-spacing: -0.005em;
+  background: #f4f5f6;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+}
+body::-webkit-scrollbar { display: none; }
+* { -webkit-overflow-scrolling: touch; }
+
+/* it should feel like an app, not a web page: no accidental text selection, but inputs stay normal */
+body { user-select: none; -webkit-user-select: none; }
+input, textarea, select, [contenteditable] { user-select: text; -webkit-user-select: text; }
+
+button, a, label, summary { cursor: pointer; }
+button:active:not(:disabled) { transform: scale(0.98); }
+button { transition: transform 0.12s ease, background-color 0.15s ease, opacity 0.15s ease; }
+
+:focus-visible { outline: 2px solid #16181c; outline-offset: 2px; border-radius: 10px; }
+
+/* a screen slides in softly */
+@keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.page-in { animation: page-in 0.22s ease-out backwards; }
+@media (prefers-reduced-motion: reduce) { .page-in { animation: none; } button { transition: none; } }
+
+/* launch splash (in index.html) fades away when the app is ready */
+#splash { transition: opacity 0.3s ease; }
+#splash.gone { opacity: 0; pointer-events: none; }
+
+@page { size: A4; margin: 14mm; }
+@media print {
+  body { background: #fff; }
+  html { font-size: 12px; }
+}
+
+/* Telugu, Hindi and Tamil letters carry marks above and below the line: give every line more room so nothing is clipped */
+html:not([lang="en"]) body { line-height: 1.55; }
+html:not([lang="en"]) h1, html:not([lang="en"]) h2 { line-height: 1.32 !important; letter-spacing: 0; }
+html:not([lang="en"]) button { line-height: 1.4; }
+html:not([lang="en"]) .tracking-tight, html:not([lang="en"]) .tracking-widest, html:not([lang="en"]) .tracking-wide { letter-spacing: 0; }
+html:not([lang="en"]) .uppercase { text-transform: none; }
+
+
+/* weights: Kairo-style headlines are medium, not heavy */
+.font-bold, .font-extrabold { font-weight: 700; }
+.font-display.font-bold, .font-display.font-extrabold { font-weight: 700; }
+h1, h2, .font-display { letter-spacing: -0.02em; }

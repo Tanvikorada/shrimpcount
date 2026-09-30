@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShrimpCount | Every larva, counted</title>
+  <meta name="description" content="One phone photo of the tray. ShrimpCount circles every shrimp post-larva, counts them and makes a report your buyer can trust. For hatcheries and the farmers they supply." />
+  <meta property="og:title" content="ShrimpCount: every larva, counted" />
+  <meta property="og:description" content="Photo count, delivery certificate and invoice for shrimp hatcheries. Works with no signal. English, Telugu, Hindi and Tamil." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://shrimpcount-ai.vercel.app/media/layers/5_marked.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#0B0E10" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/app/apple-touch-icon.png" />
+  <link rel="icon" href="/app/icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Noto+Sans+Telugu:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="preload" href="media/hand-phone.webp" as="image" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }</script>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="ShrimpCount home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12.5" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="16" cy="16" r="4" fill="currentColor"/></svg>
+      <span>ShrimpCount</span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#inside">How it counts</a>
+      <a href="#journey">Hatcheries</a>
+      <a href="#farmers">Farmers</a>
+      <a href="#app">The app</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-right">
+      <label class="lang"><span class="sr-only">Language</span>
+        <select id="lang" aria-label="Language">
+          <option value="en">EN</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option><option value="ta">தமிழ்</option>
+        </select>
+      </label>
+      <button class="btn btn-light" type="button" data-install><i class="ph ph-download-simple"></i><span data-i18n="install_btn">Install</span></button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO: a live 3D tray. A hand raises a phone, the checks pass, the shutter is pressed, and every larva is counted. -->
+    <section class="hero" id="hero">
+      <div class="hero-stage">
+        <canvas id="gl" aria-label="A 3D tray of shrimp post-larvae being photographed with a phone and counted" role="img"></canvas>
+        <img class="hero-fallback" src="media/layers/5_marked.jpg" alt="A tray of post-larvae with every larva circled" />
+
+        <div class="vf" id="vf" aria-hidden="true">
+          <div class="vf-grid"></div>
+          <div class="vf-chips"><span><i class="ph ph-sun"></i>Light</span><span><i class="ph ph-drop-half"></i>No glare</span><span><i class="ph ph-crosshair"></i>Level</span></div>
+          <div class="vf-focus"></div>
+          <div class="vf-shutter"><b></b></div>
+          <div class="vf-flash"></div>
+        </div>
+        <img class="hand" id="hand" src="media/hand-phone.webp" alt="" aria-hidden="true" />
+
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="dot"></span>For shrimp hatcheries</p>
+          <h1>Every larva.<br /><span class="grad">Counted.</span></h1>
+          <p class="sub">One phone photo of the tray. A count your buyer can trust.</p>
+          <div class="ctas">
+            <button class="btn btn-accent btn-lg" type="button" data-install><i class="ph ph-download-simple"></i><span data-i18n="lp_get_app">Get the app</span></button>
+            <a class="btn btn-glass btn-lg" href="#inside"><i class="ph ph-play"></i>See how it counts</a>
+          </div>
+        </div>
+        <div class="hero-hint" aria-hidden="true"><i class="ph ph-hand-pointing"></i>Move over the tray. Then scroll.</div>
+
+        <div class="hud" aria-hidden="true">
+          <div class="hud-row"><span class="hud-k">Camera</span><span class="hud-v" id="hud-shot">Framing</span></div>
+          <div class="hud-row"><span class="hud-k">Larvae marked</span><span class="hud-v hud-big" id="hud-count">0</span></div>
+          <div class="hud-bar"><b id="hud-bar"></b></div>
+        </div>
+        <div class="hero-end" aria-hidden="true">
+          <p class="end-kick"><span class="end-dot"></span>Count complete</p>
+          <p class="end-num" id="end-count">0</p>
+          <p class="end-lbl">larvae in one photo. In seconds.</p>
+          <ul class="end-proof">
+            <li><i class="ph ph-timer"></i><b>Seconds</b> from photo to count</li>
+            <li><i class="ph ph-target"></i><b>&plusmn;1%</b> of a careful hand count</li>
+            <li><i class="ph ph-image-square"></i>Every larva marked on the photo</li>
+          </ul>
+        </div>
+        <p class="hero-note">Live 3D demo. Every larva drawn here is counted by the page itself.</p>
+      </div>
+    </section>
+
+    <!-- BREAKDOWN: the real layers of one count, as a rotating 3D stack -->
+    <section class="inside" id="inside">
+      <div class="inside-stage">
+        <canvas id="layers-gl" aria-label="The five real processing layers of one count, stacked in 3D" role="img"></canvas>
+        <div class="inside-head">
+          <p class="eyebrow">Inside one count</p>
+          <h2>From photo to <span class="grad">number</span>.</h2>
+        </div>
+        <ol class="steps" aria-label="Steps of one count">
+          <li><span class="st-n">01</span><div><p class="st-t">The photo</p><p class="st-d">One phone photo of the tray. Nothing else.</p></div><i class="st-bar"></i></li>
+          <li><span class="st-n">02</span><div><p class="st-t">Tray found</p><p class="st-d">Walls, rim and glare are left out.</p></div><i class="st-bar"></i></li>
+          <li><span class="st-n">03</span><div><p class="st-t">What the counter sees</p><p class="st-d">Each larva shows up as a dark head spot.</p></div><i class="st-bar"></i></li>
+          <li><span class="st-n">04</span><div><p class="st-t">2,191 head spots</p><p class="st-d">Clumps are split, one spot per larva.</p></div><i class="st-bar"></i></li>
+          <li><span class="st-n">05</span><div><p class="st-t">Every larva marked</p><p class="st-d">Check the marks. Tap to add or remove one.</p></div><i class="st-bar"></i></li>
+        </ol>
+        <p class="step-cap" aria-hidden="true"></p>
+        <div class="inside-result" aria-live="polite">
+          <p class="end-kick"><span class="end-dot"></span>Counted on this tray</p>
+          <p class="end-num" id="inside-count">0</p>
+          <p class="end-lbl">larvae. Every one marked on the photo.</p>
+        </div>
+        <p class="inside-note">Real output of our counter on one tray image.</p>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="At a glance">
+      <div class="wrap stats-grid">
+        <div class="stat"><p class="stat-v"><span class="strike">15–20</span> min</p><p class="stat-k">per tray by hand, today</p></div>
+        <div class="stat"><p class="stat-v grad">Seconds</p><p class="stat-k" data-i18n="lp_tr1">Counts in seconds, not minutes</p></div>
+        <div class="stat"><p class="stat-v"><span class="count-up" data-to="0">0</span> bars</p><p class="stat-k" data-i18n="lp_tr2">Works with no signal</p></div>
+        <div class="stat"><p class="stat-v"><span class="count-up" data-to="4">0</span></p><p class="stat-k" data-i18n="lp_tr3">English, Telugu, Hindi and Tamil</p></div>
+      </div>
+    </section>
+
+    <!-- JOURNEY: from the sea to a hatchery shed, into a sample bowl, then up and inland to the farm ponds -->
+    <section class="journey" id="journey" aria-label="From a seaside hatchery to the farm ponds">
+      <div class="journey-stage">
+        <img class="hatch-poster" src="media/hatch-poster.jpg" alt="" />
+        <video class="hatch-video" muted playsinline preload="none" aria-label="A drone flight from the sea into a hatchery shed and down to a tank"></video>
+        <canvas id="uw-gl" aria-label="Inside a tank: larvae swim around the camera and grow into prawns" role="img"></canvas>
+        <video class="uw-prawns" muted playsinline preload="none" aria-label="Grown prawns swimming"></video>
+        <video class="uw-bubbles" muted loop playsinline preload="none" data-src="media/bubbles-loop.mp4" aria-hidden="true"></video>
+        <img class="film-poster" src="media/farm-poster.jpg" alt="" />
+        <video class="film-video" muted playsinline preload="none" aria-hidden="true"></video>
+        <div class="haze" aria-hidden="true"></div>
+        <div class="journey-shade"></div>
+        <div class="j-cap" data-at="0.04" data-w="0.045"><p class="eyebrow">The journey of one count</p><h2>Hatcheries sit by the sea.</h2></div>
+        <div class="j-cap" data-at="0.125" data-w="0.045"><h2>Shed after shed of rearing tanks.</h2></div>
+        <div class="j-cap" data-at="0.24" data-w="0.028"><h2>Inside, the water never stops moving.</h2></div>
+        <div class="j-cap" data-at="0.292" data-w="0.022"><h2>Every tank is sold by count.</h2><p>Today that count is done by hand, spoon by spoon.</p></div>
+        <div class="j-cap" data-at="0.38" data-w="0.04"><h2>Thousands in every tank.<br /><span class="grad">Each one counts.</span></h2></div>
+        <div class="j-cap" data-at="0.52" data-w="0.04"><h2>From larva <span class="grad">to harvest.</span></h2><p>Counted right at the start.</p></div>
+        <div class="j-cap" data-at="0.7"><p class="eyebrow">For farmers</p><h2>Then the seed travels to the pond.</h2></div>
+        <div class="j-cap" data-at="0.83"><h2>Every pond is stocked by count.</h2></div>
+        <div class="j-cap" data-at="0.955" data-w="0.05"><h2>Now the proof arrives <span class="grad">with the seed.</span></h2><p>Marked photo, count and certificate, on WhatsApp.</p></div>
+        <p class="j-note">Hatchery flight is AI-generated video; inside the shed is 3D built from real hatchery photos. Prawn, bubble and pond footage from Pexels.</p>
+      </div>
+      <span class="anchor" id="farmers" aria-hidden="true"></span>
+    </section>
+
+    <section class="gains" aria-label="Who gains">
+      <div class="wrap">
+        <div class="gains-head">
+          <p class="eyebrow">Who gains</p>
+          <h2>One count. <span class="grad">Trusted at both ends.</span></h2>
+        </div>
+        <div class="gains-grid">
+          <article class="gain-col spot">
+            <p class="eyebrow"><i class="ph ph-buildings"></i> Hatcheries</p>
+            <p class="gain-t">Sell by count, with proof.</p>
+            <ul>
+              <li><i class="ph ph-lightning"></i>Count a tray in seconds</li>
+              <li><i class="ph ph-seal-check"></i>Proof behind every sale</li>
+              <li><i class="ph ph-file-text"></i>Report, certificate and invoice from one count</li>
+              <li><i class="ph ph-stack"></i>Batches, quality checks, traceability</li>
+            </ul>
+          </article>
+          <div class="gain-link" aria-hidden="true"><span>seed<br> + proof</span><i class="ph ph-arrow-right"></i></div>
+          <article class="gain-col spot warm">
+            <p class="eyebrow"><i class="ph ph-plant"></i> Farmers</p>
+            <p class="gain-t">Stock the pond with confidence.</p>
+            <ul>
+              <li><i class="ph ph-image-square"></i>See the marked photo behind your seed</li>
+              <li><i class="ph ph-certificate"></i>Certificate with count, PL stage and date</li>
+              <li><i class="ph ph-arrow-counter-clockwise"></i>No recount at the pond</li>
+              <li><i class="ph ph-device-mobile"></i>Nothing to install</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE APP -->
+    <section class="app" id="app">
+      <div class="wrap app-grid">
+        <div class="app-copy">
+          <p class="eyebrow" data-i18n="lp_app_kicker">Get the app</p>
+          <h2 data-i18n="lp_app_h">A real app on your phone</h2>
+          <p class="lead" data-i18n="lp_app_b">Install ShrimpCount on Android or iPhone. It opens from your home screen like any app, and keeps working with no signal.</p>
+          <div class="ctas">
+            <button class="btn btn-accent btn-lg" type="button" data-install><i class="ph ph-download-simple"></i><span data-i18n="install_app">Install the app</span></button>
+            <a class="btn btn-glass btn-lg" href="/app/#/login"><span data-i18n="lp_signin">Sign in</span></a>
+          </div>
+          <p class="fine"><span data-i18n="lp_app_note">Free. No app store account needed.</span> <span data-i18n="lp_note">Try free: 2 counts, no account needed. Works without signal.</span></p>
+          <div class="qr"><img src="media/qr-app.svg" alt="QR code to open the app on your phone" width="84" height="84" /><p>On a computer? Scan to open it on your phone.</p></div>
+        </div>
+        <div class="phone-3d" id="phone3d" aria-hidden="true">
+          <div class="phone-scene">
+            <div class="phone">
+              <img class="scr is-on" src="media/app/4_home.jpg" alt="" />
+              <img class="scr" src="media/app/1_take.jpg" alt="" loading="lazy" />
+              <img class="scr" src="media/app/2_review.jpg" alt="" loading="lazy" />
+              <img class="scr" src="media/app/5_batch.jpg" alt="" loading="lazy" />
+              <img class="scr" src="media/app/6_report.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="float f1"><i class="ph ph-check-circle"></i>Saved. 2,235 counted.</div>
+            <div class="float f2"><i class="ph ph-wifi-slash"></i>Works offline</div>
+            <div class="float f3"><i class="ph ph-share-network"></i>Report sent on WhatsApp</div>
+          </div>
+          <div class="phone-tabs">
+            <button type="button" class="is-on" data-s="0">Home</button><button type="button" data-s="1">Photo</button><button type="button" data-s="2">Check</button><button type="button" data-s="3">Batch</button><button type="button" data-s="4">Report</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="chips" aria-label="Everything in the app">
+          <span><i class="ph ph-camera"></i>Guided camera</span><span><i class="ph ph-hand-tap"></i>Tap to fix marks</span><span><i class="ph ph-selection"></i>Reads only the water</span>
+          <span><i class="ph ph-users-three"></i>Handles crowding</span><span><i class="ph ph-ruler"></i>Size by PL stage</span><span><i class="ph ph-stack"></i>Batches &amp; averages</span>
+          <span><i class="ph ph-chart-line"></i>Consistency chart</span><span><i class="ph ph-clock-counter-clockwise"></i>Count history + CSV</span><span><i class="ph ph-file-text"></i>Count report</span>
+          <span><i class="ph ph-certificate"></i>Delivery certificate</span><span><i class="ph ph-receipt"></i>Invoice</span><span><i class="ph ph-shopping-cart"></i>PL orders &amp; payments</span>
+          <span><i class="ph ph-currency-inr"></i>Price log</span><span><i class="ph ph-microscope"></i>PL quality checks</span><span><i class="ph ph-first-aid-kit"></i>Disease tests</span>
+          <span><i class="ph ph-path"></i>Traceability</span><span><i class="ph ph-notebook"></i>Production log</span><span><i class="ph ph-drop"></i>Water quality</span>
+          <span><i class="ph ph-package"></i>Inventory</span><span><i class="ph ph-check-square"></i>Tasks</span><span><i class="ph ph-trend-up"></i>Growth projection</span>
+          <span><i class="ph ph-calculator"></i>Calculators</span><span><i class="ph ph-wifi-slash"></i>Offline queue</span><span><i class="ph ph-cloud-check"></i>Team backup</span>
+          <span><i class="ph ph-translate"></i>4 languages</span><span><i class="ph ph-text-aa"></i>Big text</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="acc" id="accuracy">
+      <video data-src="media/bubbles-loop.mp4" poster="media/bubbles-poster.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+      <div class="wrap acc-grid">
+        <div>
+          <p class="eyebrow" data-i18n="lp_acc_h">Honest about accuracy</p>
+          <p class="acc-big">Within <span class="grad">1%</span> of an 1,800 hand count.</p>
+          <p class="acc-sub" data-i18n="lp_acc_c">We are still testing other PL stages with hatcheries. Until you have compared it with your own hand count on your own trays, treat the number as an estimate.</p>
+        </div>
+        <div class="gauge" aria-hidden="true">
+          <svg viewBox="0 0 200 200"><circle class="g-track" cx="100" cy="100" r="84"/><circle class="g-fill" id="g-fill" cx="100" cy="100" r="84"/></svg>
+          <div class="g-center"><p class="g-num"><span id="g-num">0</span>%</p><p class="g-lbl">agreement on a PL14 tray</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+      <div class="wrap price-grid">
+        <div>
+          <p class="eyebrow" data-i18n="lp_price_kicker">Pricing</p>
+          <h2 data-i18n="lp_price_h">One price. Count as much as you like.</h2>
+          <p class="pill"><i class="ph ph-gift"></i><span data-i18n="lp_a3">It is free during the pilot.</span></p>
+        </div>
+        <div class="price-border">
+          <div class="price">
+            <p class="price-amt"><span>₹</span>10,000</p>
+            <p class="price-setup" data-i18n="lp_price_setup">one-time setup - includes your first month</p>
+            <p class="price-then" data-i18n="lp_price_then" data-n="5,000">then ₹5,000 / month after that</p>
+            <ul>
+              <li><i class="ph ph-check"></i><span data-i18n="lp_price_f1">Unlimited counts and photos</span></li>
+              <li><i class="ph ph-check"></i><span data-i18n="lp_price_f2">Count report, delivery certificate and invoice</span></li>
+              <li><i class="ph ph-check"></i><span data-i18n="lp_price_f3">Backup and sharing across your whole team</span></li>
+              <li><i class="ph ph-check"></i><span data-i18n="lp_price_f4">All four languages, on any number of phones</span></li>
+            </ul>
+            <a class="btn btn-accent btn-lg btn-block" data-mail href="#contact"><i class="ph ph-envelope-simple"></i><span data-i18n="lp_price_cta">Talk to us to start</span></a>
+            <p class="fine" data-i18n="lp_price_note">Paid monthly, by UPI or bank transfer - no card on file. Try free first: 2 counts, no account needed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq">
+      <div class="wrap faq-grid">
+        <div>
+          <h2 data-i18n="lp_faq">Questions</h2>
+          <p class="lead small">Engineers, recruiters and students: the last three are for you.</p>
+          <div class="ask spot">
+            <p class="ask-t">Still unsure?</p>
+            <p class="ask-d">Tell us about your hatchery. Write in English, Telugu, Hindi or Tamil.</p>
+            <a class="btn btn-glass" data-mail href="#"><i class="ph ph-envelope-simple"></i>Talk to us</a>
+          </div>
+        </div>
+        <div class="qa">
+          <details><summary><span data-i18n="lp_q1">Does it work without internet?</span><i class="ph ph-plus"></i></summary><p data-i18n="lp_a1">You can take photos and count by tapping with no signal. The automatic count runs when you are back online.</p></details>
+          <details><summary><span data-i18n="lp_q2">Who can see my records?</span><i class="ph ph-plus"></i></summary><p data-i18n="lp_a2">Records stay on your phone. With an account they are backed up to a private space that only your hatchery team can open.</p></details>
+          <details><summary><span data-i18n="lp_q3">What does it cost?</span><i class="ph ph-plus"></i></summary><p><span data-i18n="lp_a3">It is free during the pilot.</span> Then ₹10,000 one-time setup including the first month, and ₹5,000 a month per hatchery.</p></details>
+          <details><summary><span data-i18n="lp_q4">Do I have to make an account?</span><i class="ph ph-plus"></i></summary><p data-i18n="lp_a4">No. You can count without one. An account only adds backup and sharing between phones.</p></details>
+          <details><summary><span>How do I install it?</span><i class="ph ph-plus"></i></summary><p>Tap Install on this page. On iPhone, open the app in Safari, tap Share, then Add to Home Screen. No app store needed.</p></details>
+          <details><summary><span>Does it count a whole tank?</span><i class="ph ph-plus"></i></summary><p>No. It counts the sample on a standard tray. A batch of samples gives the tank estimate.</p></details>
+          <details><summary><span>I am a farmer. What do I get?</span><i class="ph ph-plus"></i></summary><p>Your hatchery can send the marked photo, the count report and the delivery certificate with your seed. You install nothing.</p></details>
+          <details><summary><span>How does the counter work?</span><i class="ph ph-plus"></i></summary><p>It finds the tray, removes the background, and looks for the dark head spot of each post-larva, since the body is almost transparent. Noise and faint tails are filtered by size and contrast, clumps are split by expected size for the PL stage, and a person confirms the marks. A classical OpenCV engine runs today; a YOLO11 detector (ONNX) must beat it on the same held-out batches before it ships.</p></details>
+          <details><summary><span>How is accuracy measured?</span><i class="ph ph-plus"></i></summary><p>Data is split by batch, never by random image, so the test set is a day the model has not seen. Only numbers from the evaluation script on held-out batches are quoted. No synthetic images stand in for real hatchery photos.</p></details>
+          <details><summary><span>What is it built with?</span><i class="ph ph-plus"></i></summary><p>An offline-first React PWA, a FastAPI counting service, OpenCV and ONNX Runtime. This page uses three.js and GSAP.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="final" id="contact">
+      <canvas id="field" aria-hidden="true"></canvas>
+      <div class="wrap">
+        <h2 data-i18n="lp_final">Ready to count your next tray?</h2>
+        <div class="ctas center">
+          <button class="btn btn-accent btn-lg" type="button" data-install><i class="ph ph-download-simple"></i><span data-i18n="lp_get_app">Get the app</span></button>
+          <a class="btn btn-glass btn-lg" data-mail href="#contact"><i class="ph ph-envelope-simple"></i><span data-i18n="lp_price_cta">Talk to us to start</span></a>
+        </div>
+        <p class="fine">tanvikorada@gmail.com</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-top">
+        <div class="foot-brand">
+          <a class="brand" href="#top"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12.5" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="16" cy="16" r="4" fill="currentColor"/></svg><span>ShrimpCount</span></a>
+          <p data-i18n="lp_foot">ShrimpCount · Postlarvae counting for hatcheries</p>
+          <button class="btn btn-accent" type="button" data-install><i class="ph ph-download-simple"></i>Get the app</button>
+        </div>
+        <nav class="foot-col" aria-label="Product">
+          <p>Product</p>
+          <a href="#inside">How it counts</a><a href="#journey">Hatcheries</a><a href="#farmers">Farmers</a><a href="#app">The app</a><a href="#pricing">Pricing</a>
+        </nav>
+        <nav class="foot-col" aria-label="App">
+          <p>App</p>
+          <a href="/app/">Open the app</a><a href="#faq">Questions</a><a href="#accuracy">Accuracy</a>
+        </nav>
+        <div class="foot-col">
+          <p>Contact</p>
+          <a data-mail href="#">tanvikorada@gmail.com</a>
+          <span>English · తెలుగు · हिन्दी · தமிழ்</span>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>&copy; 2026 ShrimpCount</span>
+        <span class="muted">Hero and breakdown are live 3D. The hatchery flight is AI-generated video. Prawn, bubble, aeration and pond footage from Pexels. App screens and counter output are real.</span>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="sheet" id="ios-sheet" aria-labelledby="ios-title">
+    <h2 id="ios-title" data-i18n="install_app">Install the app</h2>
+    <p class="step hl"><i class="ph ph-apple-logo"></i><span data-i18n="install_ios">iPhone: tap the Share button at the bottom of Safari, then "Add to Home Screen".</span></p>
+    <p class="step"><i class="ph ph-android-logo"></i><span data-i18n="install_android">Android: tap the ⋮ menu at the top right of Chrome, then "Install app" or "Add to Home screen".</span></p>
+    <div class="ctas">
+      <a class="btn btn-accent" href="/app/"><span>Open the app</span></a>
+      <button class="btn btn-glass" type="button" data-close><span data-i18n="install_close">Got it</span></button>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script type="module" src="js/site.js"></script>
+</body>
+</html>

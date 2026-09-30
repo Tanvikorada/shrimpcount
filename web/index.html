@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B0E10" />
+    <meta name="color-scheme" content="light" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ShrimpCount" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet" />
+    <title>ShrimpCount</title>
+    <style>
+      /* Launch screen. Pure CSS so it plays before any script loads. Tells the product's own story: the ring the app draws
+       around every counted larva draws itself in, then the confirming dot lands - exactly what happens on the review
+       screen after every real count. Restrained: no bounce, no loop, done in under a second. Same mark as the in-app logo. */
+      #splash { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        background: #0B0E10; color: #F3F2ED;
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+        transition: opacity 0.35s ease; }
+      #splash.gone { opacity: 0; pointer-events: none; }
+      #splash .stage { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+      #splash .tile { width: 108px; height: 108px; animation: sc-tile 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+      #splash .ring { fill: none; stroke: #fff; stroke-width: 8; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: sc-draw 0.5s 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+      #splash .dot { transform-box: fill-box; transform-origin: center; opacity: 0; transform: scale(0.2); animation: sc-land 0.4s 0.62s cubic-bezier(0.3, 1.5, 0.4, 1) forwards; }
+      #splash .ring-hair { fill: none; stroke: rgba(22,24,28,0.08); stroke-width: 8; }
+      #splash .name { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; opacity: 0; animation: sc-rise 0.4s 0.85s ease-out forwards; }
+      #splash .sub { margin-top: -12px; font-size: 14px; font-weight: 500; color: #98A1A7; opacity: 0; animation: sc-rise 0.4s 0.98s ease-out forwards; }
+      @keyframes sc-tile { 0% { transform: scale(0.94); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+      @keyframes sc-draw { to { stroke-dashoffset: 0; } }
+      @keyframes sc-land { 0% { opacity: 0; transform: scale(0.2); } 70% { opacity: 1; transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }
+      @keyframes sc-rise { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: none; } }
+      /* a returning launch: same picture, quicker, no delays */
+      #splash.quick .tile, #splash.quick .ring, #splash.quick .dot, #splash.quick .name, #splash.quick .sub {
+        animation-delay: 0s !important; animation-duration: 0.2s !important;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash .tile, #splash .ring, #splash .dot, #splash .name, #splash .sub { animation: none !important; opacity: 1 !important; stroke-dashoffset: 0 !important; transform: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash" aria-hidden="true">
+      <div class="stage">
+        <svg class="tile" viewBox="0 0 100 100">
+          <rect width="100" height="100" rx="22" fill="#16181c" stroke="#2A3237" stroke-width="2" />
+          <circle class="ring-hair" cx="46" cy="48" r="23" />
+          <circle class="ring" pathLength="1" cx="46" cy="48" r="23" />
+          <circle class="dot" cx="70" cy="70" r="9" fill="#FF8A6A" />
+        </svg>
+        <div class="name">ShrimpCount</div>
+        <div class="sub">Count larvae from a photo</div>
+      </div>
+    </div>
+    </div>
+    </div>
+    <script>
+      /* The launch animation belongs to the installed app. Someone opening the website goes straight to the page. */
+      try {
+        var sp = document.getElementById('splash');
+        var installed = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+        if (!installed) sp.parentNode.removeChild(sp);
+        else if (localStorage.getItem('shrimpcount.launched')) sp.classList.add('quick');
+      } catch (e) {}
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
