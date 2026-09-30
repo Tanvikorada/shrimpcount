@@ -6,7 +6,7 @@ import { clamp01, ease, easeIO, lerp, band, whileVisible, makeRenderer } from ".
 const FILES = ["1_photo", "2_outline", "3_heat", "4_spots", "5_marked"];
 const GLOW = new Set([2, 3]); // dark-background layers glow over the ones below
 const STEP0 = 0.2, STEP = 0.1;  // step k is in focus over [STEP0 + k*STEP, STEP0 + (k+1)*STEP]
-const COUNT = 2191;             // real marks our counter found on this tray (media/tray-marks.json)
+const COUNT = 2548;             // larvae the real counter finds on this real tray photo (media/tray-marks.json, tools/make_breakdown_layers.py)
 
 export function initBreakdown({ ScrollTrigger, reduce, fmt }) {
   const section = document.getElementById("inside");
@@ -22,7 +22,7 @@ export function initBreakdown({ ScrollTrigger, reduce, fmt }) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-  const PW = 4, PH = 4 * 896 / 1200;
+  const PW = 4, PH = 4;                        // the real tray photo is square
   const stack = new THREE.Group(); scene.add(stack);
   const loader = new THREE.TextureLoader();
   const layers = FILES.map((f, i) => {
@@ -95,7 +95,7 @@ export function initBreakdown({ ScrollTrigger, reduce, fmt }) {
 
     const elev = lerp(Math.PI / 2 - 0.001, mobile ? 0.66 : 0.56, tiltK) - sy * 0.04 * open;
     const settle = ease(band(p, 0.76, 0.86));
-    const dist = (mobile ? 15.5 : 10.6) + (mobile ? 3.2 : 2.2) * open - (mobile ? 0.2 : 1.2) * settle;
+    const dist = (mobile ? 19 : 11.4) + (mobile ? 3.2 : 2.2) * open - (mobile ? 0.2 : 1.2) * settle;
     camera.position.set(0, Math.sin(elev) * dist, Math.cos(elev) * dist);
     camera.lookAt(0, top * 0.45, 0);
     // desktop: the stack sits right of the step rail, and right of the number at the end
