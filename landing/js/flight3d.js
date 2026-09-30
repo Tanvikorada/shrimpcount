@@ -128,6 +128,8 @@ export function build3D(renderer, canvas, mobile, opts = {}) {
   renderer.toneMappingExposure = 0.55;
   renderer.shadowMap.enabled = !mobile;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // the sun and the buildings never move: draw the shadows once, not every frame
+  renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(mobile ? 62 : 48, 1, 0.08, 15000);
 
@@ -670,8 +672,8 @@ function makeProjection(renderer, scene, sea, pose, mobile, box) {
   });
   const size = new THREE.Vector2();
   renderer.getDrawingBufferSize(size);
-  const colorRT = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: mobile ? 0 : 4 });
-  const posRT = floatRT(size.x, size.y);
+  const colorRT = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: mobile ? 0 : 2 });
+  const posRT = floatRT(Math.ceil(size.x / 2), Math.ceil(size.y / 2));   // positions only steer which photo paints a pixel: half size is plenty
   const dummy = new THREE.DataTexture(new Float32Array(4), 1, 1, THREE.RGBAFormat, THREE.FloatType); dummy.needsUpdate = true;
   const U = { tColor: { value: colorRT.texture }, tPos: { value: posRT.texture }, exposure: { value: 0.55 }, time: { value: 0 }, wt: { value: new THREE.Vector3() }, side: { value: new THREE.Vector3() }, bmin: { value: box.min }, bmax: { value: box.max }, uWaterY: { value: box.min.y + 1 + 1.25 - 0.08 }, uWaterFade: { value: 1 } };
   for (let i = 0; i < 3; i++) Object.assign(U, { ["ph" + i]: { value: dummy }, ["pp" + i]: { value: dummy }, ["vp" + i]: { value: new THREE.Matrix4() }, ["cp" + i]: { value: new THREE.Vector3() } });
@@ -691,7 +693,7 @@ function makeProjection(renderer, scene, sea, pose, mobile, box) {
     ready: () => P[0].ok,
     render(camera, j, now) {
       renderer.getDrawingBufferSize(size);
-      if (colorRT.width !== size.x || colorRT.height !== size.y) { colorRT.setSize(size.x, size.y); posRT.setSize(size.x, size.y); }
+      if (colorRT.width !== size.x || colorRT.height !== size.y) { colorRT.setSize(size.x, size.y); posRT.setSize(Math.ceil(size.x / 2), Math.ceil(size.y / 2)); }
       renderer.setRenderTarget(colorRT); renderer.render(scene, camera); renderer.setRenderTarget(null);
       positions(camera, posRT);
       // the two photos either side of here, cross-weighted, plus the next one as a quiet fallback for gaps

@@ -40,7 +40,7 @@ export function initJourney({ ScrollTrigger, reduce }) {
   }, { rootMargin: "2500px 0px" }).observe(section);
 
   let r3 = null;
-  try { r3 = build3D(makeRenderer(canvas, { opaque: true, maxDpr: 1.75 }), canvas, mobile, { photos: true }); } catch { r3 = null; }
+  try { r3 = build3D(makeRenderer(canvas, { opaque: true, maxDpr: 1.25 }), canvas, mobile, { photos: true }); } catch { r3 = null; }
   // the 3D segment runs from the door to the end of its flight; map moments of that flight onto the scroll
   const s0 = r3 ? r3.scrollFor(DOOR_J) : 0;
   const jAt = (jOld) => (r3 ? lerp(SHED[0], SHED[1], (r3.scrollFor(jOld) - s0) / (1 - s0)) : 0);
