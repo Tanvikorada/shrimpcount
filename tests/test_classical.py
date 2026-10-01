@@ -159,6 +159,17 @@ def test_fit_tray_keeps_the_prior_when_there_is_no_edge():
     assert all(abs(a[0] - b[0]) < 0.02 and abs(a[1] - b[1]) < 0.02 for a, b in zip(poly, PRESET_TRAY_NORM))
 
 
+def test_fit_tray_starts_from_a_given_prior_not_the_preset():
+    """The operator's own saved outline (e.g. a different tray or camera box) should be what gets refitted, not the
+    generic preset - with no edge to find, the result is that outline back, unchanged."""
+    from classical import PRESET_TRAY_NORM, fit_tray
+    flat = np.full((1280, 1280, 3), 200, np.uint8)
+    own = [(0.2, 0.1), (0.8, 0.1), (0.95, 0.2), (0.95, 0.8), (0.8, 0.9), (0.2, 0.9), (0.05, 0.8), (0.05, 0.2)]
+    poly, notes = fit_tray(flat, prior=own)
+    assert all(abs(a[0] - b[0]) < 0.02 and abs(a[1] - b[1]) < 0.02 for a, b in zip(poly, own))
+    assert not all(abs(a[0] - b[0]) < 0.02 and abs(a[1] - b[1]) < 0.02 for a, b in zip(poly, PRESET_TRAY_NORM[:len(own)]))
+
+
 def _pl14_animal(img, x, y):
     """A larger larva: two small eye dots at the head and one continuous dark body behind them (about 30 px long)."""
     m = np.zeros(img.shape[:2], np.float32)

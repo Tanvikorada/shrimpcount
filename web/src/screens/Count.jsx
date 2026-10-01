@@ -150,10 +150,13 @@ export default function Count({ batchId, store, go }) {
     img.src = u
     setPhase('analyzing')
     try {
-      const data = await countImage(f, size)
+      // start this photo's tray fit from the operator's own outline, not the generic preset: a hand-held phone drifts a
+      // little shot to shot, so sliding their outline onto this photo's real edges tracks that; a stale, unrefitted
+      // outline does not (see fit_tray in classical.py, and parse_prior in api/main.py)
+      const data = await countImage(f, size, activeTray(readTrays())?.norm)
       setLarvaUsed(size)
       setDets(data.detections.map((d) => ({ cx: (d.x1 + d.x2) / 2, cy: (d.y1 + d.y2) / 2, r: Math.max(4, (d.x2 - d.x1 + d.y2 - d.y1) / 4), added: false, removed: false, est: data.engine === 'classical' && d.confidence === 0.5 })))
-      presetRef.current = data.tray_fit || data.tray_preset || null; setTrayNorm(activeTray(readTrays())?.norm || presetRef.current); setGlare(data.meta?.glare_ignored || 0); setEditTray(false)
+      presetRef.current = data.tray_fit || data.tray_preset || null; setTrayNorm(presetRef.current); setGlare(data.meta?.glare_ignored || 0); setEditTray(false)
       setPredicted(data.count); setEngine(data.engine); setMs(data.processing_ms); setMethod('ai'); setMode('remove')
     } catch (err) {
       const noNet = err instanceof TypeError || !navigator.onLine

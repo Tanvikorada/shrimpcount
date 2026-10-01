@@ -21,11 +21,13 @@ async function shrink(file) {
   throw new Error('Photo is too large to send. Try a lower camera resolution.')
 }
 
-export async function countImage(file, size = 'small') {
+export async function countImage(file, size = 'small', prior = null) {
   const { blob, scale, width, height } = await shrink(file)
   const body = new FormData()
   body.append('file', blob, file.name || 'sample.jpg')
-  const res = await fetch(`${API}/count?size=${size}`, { method: 'POST', body })
+  const q = new URLSearchParams({ size })
+  if (prior?.length >= 3) q.set('prior', JSON.stringify(prior))
+  const res = await fetch(`${API}/count?${q}`, { method: 'POST', body })
   if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || `Server error ${res.status}`)
   const data = await res.json()
   if (scale !== 1) {

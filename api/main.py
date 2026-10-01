@@ -4,6 +4,7 @@ Loads an Ultralytics-exported ONNX model (single class 'larva') from MODEL_PATH.
 Assumes ONNX output shape (1, 5, N) = [cx, cy, w, h, score] per candidate, tile input imgsz x imgsz.
 Not yet tested against a real trained model. Verify output shape after the first export.
 """
+import json
 import os
 import sys
 import time
@@ -77,6 +78,22 @@ def parse_roi(roi: str | None):
     return (cx, cy, r)
 
 
+def parse_prior(prior: str | None):
+    """The operator's current tray outline (their saved profile, or last fit), as a starting point for this photo's
+    fit: a hand-held phone drifts a little shot to shot, so re-sliding their own outline onto this photo's real edges
+    beats both a bare generic preset and reusing their old outline unrefitted (see fit_tray in classical.py)."""
+    if not prior:
+        return None
+    try:
+        pts = json.loads(prior)
+        pts = [(float(x), float(y)) for x, y in pts]
+    except (ValueError, TypeError):
+        return None
+    if len(pts) < 3 or not all(0 <= x <= 1 and 0 <= y <= 1 for x, y in pts):
+        return None
+    return pts
+
+
 @app.post("/count")
 async def count(
     file: UploadFile = File(...),
@@ -84,6 +101,7 @@ async def count(
     roi: str | None = Query(None, description="Optional circle 'cx,cy,r' (fractions) to count inside, e.g. the tray"),
     min_area: float | None = Query(None, gt=0, description="Classical engine: smallest blob (px^2) treated as a larva"),
     size: str = Query("small", pattern="^(small|large)$", description="Larva size: small (up to about PL12) or large (PL13 and up)"),
+    prior: str | None = Query(None, description="The operator's current tray outline, as a JSON array of [x,y] fractions, to refit onto this photo instead of starting from the generic preset"),
 ):
     data = await file.read()
     if len(data) > MAX_BYTES:
@@ -107,7 +125,7 @@ async def count(
             params.min_area = min_area
         boxes, meta = classical_detect(img, params)
     try:
-        norm = fit_tray(img)[0]
+        norm = fit_tray(img, prior=parse_prior(prior))[0]
         if use == "classical" and len(boxes):
             norm = refine_tray_by_marks(norm, np.c_[(boxes[:, 0] + boxes[:, 2]) / 2, (boxes[:, 1] + boxes[:, 3]) / 2], img.shape[1], img.shape[0])
         tray_fit = [[round(x, 4), round(y, 4)] for x, y in norm]

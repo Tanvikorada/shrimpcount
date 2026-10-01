@@ -1,4 +1,5 @@
 import io
+import json
 import sys
 from pathlib import Path
 
@@ -60,3 +61,20 @@ def test_count_accepts_a_larva_size_and_reports_it():
 
 def test_an_unknown_larva_size_is_refused():
     assert client.post("/count?size=huge", files={"file": jpeg(tray(50))}).status_code == 422
+
+
+def test_tray_fit_starts_from_the_operators_own_outline():
+    """A prior sent by the app (its saved outline, or its last fit) should seed the fit, not the generic preset - on
+    a photo with no clear tray edge, fit_tray falls back to returning that prior unchanged (see test_classical.py)."""
+    from api.main import PRESET_TRAY_NORM
+    flat = np.full((1280, 1280, 3), 200, np.uint8)
+    own = [[0.2, 0.1], [0.8, 0.1], [0.95, 0.2], [0.95, 0.8], [0.8, 0.9], [0.2, 0.9], [0.05, 0.8], [0.05, 0.2]]
+    body = client.post(f"/count?prior={json.dumps(own)}", files={"file": jpeg(flat)}).json()
+    assert all(abs(a[0] - b[0]) < 0.02 and abs(a[1] - b[1]) < 0.02 for a, b in zip(body["tray_fit"], own))
+    assert any(abs(a[0] - b[0]) > 0.02 or abs(a[1] - b[1]) > 0.02 for a, b in zip(body["tray_fit"], PRESET_TRAY_NORM))
+
+
+def test_a_malformed_prior_falls_back_to_the_preset_instead_of_failing():
+    r = client.post("/count?prior=not-json", files={"file": jpeg(tray(5))})
+    assert r.status_code == 200
+    assert r.json()["tray_fit"] is not None
