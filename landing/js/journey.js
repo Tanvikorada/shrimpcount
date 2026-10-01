@@ -37,7 +37,7 @@ export function initJourney({ ScrollTrigger, reduce }) {
     fetch(src).then((r) => (r.ok ? r.blob() : Promise.reject(r.status))).then((b) => { film.src = URL.createObjectURL(b); }).catch(() => { film.src = src; });
   }, { rootMargin: "2500px 0px" }).observe(section);
 
-  let J = reduce ? 1 : 0, target = J;
+  let J = reduce ? 1 : 0, target = J, shown = false;
   if (ScrollTrigger && !reduce) ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
 
   function frame(now, dt) {
@@ -47,8 +47,8 @@ export function initJourney({ ScrollTrigger, reduce }) {
       const t = J * (d - 0.04);
       if (Math.abs(film.currentTime - t) > 1 / 40) film.currentTime = t;
     }
-    const ready = film.readyState >= 2;
-    poster.style.opacity = ready ? "0" : "1";
+    // readyState dips while a frame is being sought; once the film has shown a frame, the poster stays hidden
+    if (!shown && film.readyState >= 2) { shown = true; poster.style.opacity = "0"; }
     caps.forEach((c) => {
       const o = clamp01((1 - Math.abs(J - Number(c.dataset.at)) / Number(c.dataset.w || 0.06)) * 1.7);
       c.style.opacity = o > 0.001 ? "1" : "0"; c.style.transform = "";
