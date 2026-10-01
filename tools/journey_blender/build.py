@@ -389,8 +389,8 @@ plane("beach", 0, 35, 3000, 70, 0.0, M["sand"], 300, 28, beach_h)
 # farmland all round, with a hole where the pond farm sits (-290..290, -330..-810)
 for (cx, cy, sx, sy) in ((0, -165, 6000, 330), (0, -1905, 6000, 2190), (-1645, -570, 2710, 480), (1645, -570, 2710, 480)):
     plane("land", cx, cy, sx, sy, 0.0, M["fields"], 1, 1)
-plane("yard", 0, -72, 150, 170, 0.02, M["yard"])
-plane("sandyard", 0, -50, 230, 170, 0.01, M["sand"])
+plane("yard", 0, -72, 150, 170, 0.07, M["yard"])
+plane("sandyard", 0, -50, 230, 170, 0.035, M["sand"])
 
 # ---------------------------------------------------------------- hatchery sheds
 SW, SL, WH, RH = 16.0, 36.0, 4.2, 2.6
@@ -726,7 +726,7 @@ bubbles(PCX - 6, PCX + 6, PCY - 4, PCY + 8, -1.6, -0.37, 120, 0.01)
 for i in range(40):
     swimmer(pr_src, (PCX + R.gauss(0, 1.1), PCY + R.uniform(1.2, 5.5), R.uniform(-1.4, -0.75)), R.uniform(0.13, 0.18), across(), R.uniform(0.2, 0.5), (F["pond"], F["end"]), 0.12)
 
-def camera(name, keys, lens_keys):
+def camera(name, keys, lens_keys, clip_keys):
     cd = bpy.data.cameras.new(name); c = bpy.data.objects.new(name, cd); COL.objects.link(c)
     tgt = bpy.data.objects.new(name + "_t", None); COL.objects.link(tgt)
     con = c.constraints.new("TRACK_TO"); con.target = tgt; con.track_axis = "TRACK_NEGATIVE_Z"; con.up_axis = "UP_Y"
@@ -735,7 +735,13 @@ def camera(name, keys, lens_keys):
     for o in (c, tgt):
         for fc in o.animation_data.action.fcurves:
             for kp in fc.keyframe_points: kp.interpolation = "BEZIER"; kp.handle_left_type = kp.handle_right_type = "AUTO_CLAMPED"
-    cd.clip_start = 0.01; cd.clip_end = 20000; cd.sensor_width = 36; cd.dof.use_dof = True
+    cd.clip_end = 20000; cd.sensor_width = 36; cd.dof.use_dof = True
+    # near clip: far out while flying high (depth precision, no z-fighting on the ground), close in near the water
+    for fr, cs in clip_keys:
+        cd.clip_start = cs; cd.keyframe_insert("clip_start", frame=fr)
+    for fc in cd.animation_data.action.fcurves:
+        if fc.data_path == "clip_start":
+            for kp in fc.keyframe_points: kp.interpolation = "CONSTANT"
     for fr, lens, focus, fstop in lens_keys:
         cd.lens = lens; cd.keyframe_insert("lens", frame=fr)
         cd.dof.focus_distance = focus; cd.dof.keyframe_insert("focus_distance", frame=fr)
@@ -755,7 +761,8 @@ cam1 = camera("cam1", [
     (615, (4.05, -20.9, 0.72), (4.15, -24.5, 0.62)),
     (700, (4.1, -22.4, 0.62),  (4.2, -26, 0.6)),
     (812, (4.15, -24.6, 0.58), (4.3, -28, 0.58)),
-], [(1, 26, 400, 16), (350, 24, 20, 16), (400, 20, 8, 16), (585, 22, 3, 11), (615, 24, 0.9, 2.8), (812, 24, 1.1, 2.8)])
+], [(1, 26, 400, 16), (350, 24, 20, 16), (400, 20, 8, 16), (585, 22, 3, 11), (615, 24, 0.9, 2.8), (812, 24, 1.1, 2.8)],
+   [(1, 1.0), (300, 0.2), (420, 0.05), (570, 0.01)])
 cam2 = camera("cam2", [
     (816, (PCX, PCY + 6.5, -1.05), (PCX, PCY, -1.0)),
     (860, (PCX, PCY + 4.0, -0.75), (PCX, PCY - 2, -0.3)),
@@ -764,7 +771,8 @@ cam2 = camera("cam2", [
     (960, (PCX + 6, PCY + 6, 9),   (PCX - 16, PCY - 70, -0.3)),
     (1020, (PCX + 22, PCY + 34, 34), (PCX - 40, PCY - 170, -0.3)),
     (1080, (PCX + 48, PCY + 70, 78), (PCX - 70, PCY - 280, -0.3)),
-], [(816, 24, 1.2, 2.8), (880, 24, 1.5, 4), (905, 22, 30, 16), (1080, 26, 300, 16)])
+], [(816, 24, 1.2, 2.8), (880, 24, 1.5, 4), (905, 22, 30, 16), (1080, 26, 300, 16)],
+   [(816, 0.01), (930, 0.3)])
 sc.camera = cam1
 m1 = sc.timeline_markers.new("tank", frame=1); m1.camera = cam1
 m2 = sc.timeline_markers.new("pond", frame=F["pond"]); m2.camera = cam2
@@ -808,6 +816,10 @@ ct.links.new(gl.outputs[0], lens.inputs[0]); ct.links.new(lens.outputs[0], out.i
 
 bpy.context.view_layer.update()
 if arg("--save"): bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(arg("--save")))
+if arg("--log"):    # a progress line per finished frame (the Store build of Blender runs detached, with no console)
+    def _logged(scene, *_):
+        with open(arg("--log"), "a") as f: f.write("Saved %d\n" % scene.frame_current)
+    bpy.app.handlers.render_write.append(_logged)
 if arg("--anim"):
     od = arg("--out", os.path.join(HERE, "frames")); os.makedirs(od, exist_ok=True)
     sc.render.filepath = os.path.join(od, "f####"); sc.frame_step = int(arg("--anim"))
