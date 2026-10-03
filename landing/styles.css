@@ -181,6 +181,8 @@ html:not([lang="en"]) h1, html:not([lang="en"]) h2 { letter-spacing: 0; line-hei
 .journey { position: relative; height: 1250vh; }
 .journey-stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; background: #0B0E10; }
 .journey .journey-poster, .journey .journey-film { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.journey .journey-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.journey .journey-film { opacity: 0; pointer-events: none; }   /* decoded only; its frames are painted onto the canvas */
 .haze { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(120% 80% at 50% 10%, #f3f8ee 0%, #c9dccb 45%, #7f9c88 100%); }
 .journey-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgb(8 11 13 / .45) 0%, rgb(8 11 13 / 0) 28%, rgb(8 11 13 / 0) 55%, rgb(8 11 13 / .88) 100%); }
 .j-cap { position: absolute; z-index: 3; left: clamp(18px, 6vw, 88px); right: clamp(18px, 6vw, 88px); bottom: clamp(56px, 13vh, 140px); opacity: 0; transform: translateY(30px); will-change: opacity, transform; }

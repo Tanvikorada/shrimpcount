@@ -1,7 +1,9 @@
 // JOURNEY: one continuous 3D film (rendered in Blender, tools/journey_blender/build.py), scrubbed by the scroll.
 // In from the sea over a seaside hatchery, through the shed door, along the raceway tanks, down among the
 // post-larvae as they grow into prawns, up through the surface of a grow-out pond and away over the pond farm.
-// The film is all-intra encoded and loaded as a blob, so any frame can be shown instantly while scrolling.
+// The film is all-intra encoded and loaded as a blob, so any frame can be sought instantly while scrolling.
+// The <video> itself is never shown: each decoded frame is painted onto a canvas, which holds the last good
+// frame until the next is ready. (A scrubbed <video> on screen can flash between frames on some GPUs.)
 import { clamp01, smooth, whileVisible } from "./larva.js";
 
 // where each caption sits, as a share of the film (frame / 1080 of the render timeline)
@@ -11,6 +13,20 @@ export function initJourney({ ScrollTrigger, reduce }) {
   const section = document.getElementById("journey");
   const film = section.querySelector(".journey-film");
   const poster = section.querySelector(".journey-poster");
+  const cv = section.querySelector(".journey-canvas"), g = cv.getContext("2d");
+  let cw = 0, ch = 0, painted = null;
+  const paint = (src, sw, sh) => {
+    const dpr = Math.min(2, window.devicePixelRatio || 1), w = Math.round(cv.clientWidth * dpr), h = Math.round(cv.clientHeight * dpr);
+    if (w !== cw || h !== ch) { cv.width = cw = w; cv.height = ch = h; }
+    const k = Math.max(cw / sw, ch / sh), dw = sw * k, dh = sh * k;
+    g.drawImage(src, (cw - dw) / 2, (ch - dh) / 2, dw, dh); painted = src;
+  };
+  const paintPoster = () => { if (painted !== film && poster.naturalWidth) paint(poster, poster.naturalWidth, poster.naturalHeight); };
+  if (poster.complete) paintPoster(); else poster.addEventListener("load", paintPoster);
+  const paintFilm = () => { if (film.videoWidth) { paint(film, film.videoWidth, film.videoHeight); if (!reduce) poster.style.opacity = "0"; } };
+  film.addEventListener("seeked", paintFilm);
+  film.addEventListener("loadeddata", paintFilm);
+  window.addEventListener("resize", () => { if (painted === film) paintFilm(); else paintPoster(); });
   const caps = [...section.querySelectorAll(".j-cap")];
   const mobile = window.innerWidth < 760;
   // kinetic captions: every word gets its own span so words can rise out of a blur one after another
@@ -30,14 +46,17 @@ export function initJourney({ ScrollTrigger, reduce }) {
     caps.forEach((c, i) => { const gap = Math.min(i ? a[i] - a[i - 1] : 1, i < a.length - 1 ? a[i + 1] - a[i] : 1); c.dataset.w = String(Math.max(0.018, Math.min(0.05, gap * 0.48))); }); }
 
   let loaded = false;
-  new IntersectionObserver(([e]) => {
-    if (!e.isIntersecting || loaded || reduce) return;
+  const load = () => {
+    if (loaded || reduce) return;
     loaded = true;
     const src = `media/journey${mobile ? "-sm" : ""}.mp4`;
     fetch(src).then((r) => (r.ok ? r.blob() : Promise.reject(r.status))).then((b) => { film.src = URL.createObjectURL(b); }).catch(() => { film.src = src; });
-  }, { rootMargin: "2500px 0px" }).observe(section);
+  };
+  // start soon after the page settles, so the film is ready before anyone scrolls this far
+  if (document.readyState === "complete") setTimeout(load, 1200); else window.addEventListener("load", () => setTimeout(load, 1200));
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) load(); }, { rootMargin: "2500px 0px" }).observe(section);
 
-  let J = reduce ? 1 : 0, target = J, shown = false;
+  let J = reduce ? 1 : 0, target = J;
   if (ScrollTrigger && !reduce) ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
 
   function frame(now, dt) {
@@ -45,10 +64,8 @@ export function initJourney({ ScrollTrigger, reduce }) {
     const d = film.duration;
     if (d && film.readyState >= 1 && !film.seeking) {
       const t = J * (d - 0.04);
-      if (Math.abs(film.currentTime - t) > 1 / 40) film.currentTime = t;
+      if (Math.abs(film.currentTime - t) > 1 / 48) film.currentTime = t;
     }
-    // readyState dips while a frame is being sought; once the film has shown a frame, the poster stays hidden
-    if (!shown && film.readyState >= 2) { shown = true; poster.style.opacity = "0"; }
     caps.forEach((c) => {
       const o = clamp01((1 - Math.abs(J - Number(c.dataset.at)) / Number(c.dataset.w || 0.06)) * 1.7);
       c.style.opacity = o > 0.001 ? "1" : "0"; c.style.transform = "";
