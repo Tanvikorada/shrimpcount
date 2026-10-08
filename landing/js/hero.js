@@ -135,7 +135,7 @@ export function initHero({ ScrollTrigger, reduce, fmt }) {
   if (ScrollTrigger && !reduce) ScrollTrigger.create({ trigger: hero, start: "top top", end: "bottom bottom", onUpdate: (s) => { target = s.progress; } });
 
   function frame(now, dt) {
-    p += (target - p) * Math.min(1, dt * 8);
+    p += (target - p) * Math.min(1, dt * 4.5);
     const camK = ease(band(p, 0.04, 0.2));
     const phoneIn = ease(band(p, 0.1, 0.22)), phoneOut = ease(band(p, 0.42, 0.52)), phoneVis = phoneIn * (1 - phoneOut);
     const s1 = 1 - camK, s2 = ease(band(p, 0.74, 0.84));
@@ -153,7 +153,7 @@ export function initHero({ ScrollTrigger, reduce, fmt }) {
     if (mobile) camera.setViewOffset(W, H, 0, H * (0.2 * s1 + 0.25 * s2) * (1 - phoneVis), W, H);
     else camera.setViewOffset(W, H, -W * (0.25 * s1 * (1 - phoneVis) + 0.2 * s2), 0, W, H);
     // on a laptop the tray turns upright for the portrait phone screen, then back for the scan
-    rig.rotation.y = lerp(-0.18, 0, camK) + (mobile ? 0 : (Math.PI / 2) * ease(band(p, 0.1, 0.22)) * (1 - ease(band(p, 0.42, 0.52))));
+    rig.rotation.y = lerp(-0.18, 0, camK) + (mobile ? 0 : (Math.PI / 2) * ease(band(p, 0.1, 0.22)) * (1 - ease(band(p, 0.44, 0.54))));
 
     // swim until the shutter, then freeze
     const swim = 1 - band(p, 0.35, 0.37);
@@ -206,7 +206,7 @@ export function initHero({ ScrollTrigger, reduce, fmt }) {
     const handT = `translate3d(0, ${handY}px, 0) rotate(${-9 * phoneOut + 3 * (1 - phoneIn)}deg)`;
     hand.style.transform = handT; vf.style.transform = handT;
     hand.style.transformOrigin = vf.style.transformOrigin = `50% ${H}px`;
-    vf.style.opacity = String(phoneVis);
+    vf.style.opacity = String(ease(band(p, 0.19, 0.24)) * (1 - ease(band(p, 0.42, 0.46))));
     chips.forEach((c, i) => c.classList.toggle("on", p > 0.24 + i * 0.03 && p < 0.44));
     const fk = band(p, 0.3, 0.33);
     focus.style.opacity = String(fk > 0 ? 1 - band(p, 0.36, 0.4) : 0);
