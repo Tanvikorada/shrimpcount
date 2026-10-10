@@ -88,6 +88,12 @@
     --radius-3xl: 1.15rem;
   }
   html, body { background: #0B0E10 !important; color: #F3F2ED; }
+  :root { color-scheme: dark; }
+  /* form fields sit inside cards of the same colour: give them a recessed well and an edge you can see */
+  input:not([type=checkbox], [type=radio], [type=range], [type=file], [type=hidden], .hidden), select, textarea {
+    background-color: #0A0D0F !important; box-shadow: inset 0 0 0 1px #313B41 !important; }
+  input:not([type=checkbox], [type=radio], [type=range], [type=file], [type=hidden], .hidden):focus, select:focus, textarea:focus {
+    box-shadow: inset 0 0 0 2px #FF8A6A !important; }
   :focus-visible { outline-color: #FF8A6A; }
   /* cards get a hairline of light instead of a shadow */
   .bg-surface { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04); }

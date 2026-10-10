@@ -103,7 +103,7 @@ export default function Water({ store, go }) {
       <div className="mt-6">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold">{t('wq_alert_ranges')}</h2>
-          <button onClick={() => setEditRanges(!editRanges)} className="text-sm font-medium text-teal-700">{editRanges ? t('done') : t('wq_edit')}</button>
+          <button onClick={() => setEditRanges(!editRanges)} className="-my-2 -mr-2 min-h-11 px-3 text-sm font-medium text-teal-700">{editRanges ? t('done') : t('wq_edit')}</button>
         </div>
         <p className="mb-2 text-xs text-slate-500">{t('wq_ranges_hint')}</p>
         <Card className="divide-y divide-slate-100">

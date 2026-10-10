@@ -6,9 +6,9 @@ const show = (n, d = 1) => (Number.isFinite(n) ? n.toLocaleString('en-IN', { max
 
 function Result({ label, value, unit }) {
   return (
-    <div className="mt-3 flex items-baseline justify-between rounded-xl bg-slate-900 px-4 py-3 text-on-accent">
-      <span className="text-xs uppercase tracking-wide text-slate-400">{label}</span>
-      <span className="text-2xl font-semibold tabular-nums">{value}<span className="ml-1 text-sm font-normal text-slate-400">{unit}</span></span>
+    <div className="mt-3 flex items-baseline justify-between rounded-xl bg-slate-50 px-4 py-3 text-slate-900 ring-1 ring-slate-300">
+      <span className="text-xs uppercase tracking-wide text-slate-500">{label}</span>
+      <span className="text-2xl font-semibold tabular-nums">{value}<span className="ml-1 text-sm font-normal text-slate-500">{unit}</span></span>
     </div>
   )
 }

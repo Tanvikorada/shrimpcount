@@ -35,7 +35,7 @@ export default function Counts({ store, go }) {
         </div>
         <div className="mt-3 flex gap-2 text-[0.8125rem]">
           {[[t('h_7'), 7], [t('h_30'), 30], [t('h_90'), 90]].map(([l, n]) => (
-            <button key={l} onClick={() => { setFrom(daysAgo(n)); setTo(today()) }} className="rounded-full ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-teal-600 bg-surface px-3 py-1 font-medium text-slate-700">{l}</button>
+            <button key={l} onClick={() => { setFrom(daysAgo(n)); setTo(today()) }} className="rounded-full ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-teal-600 bg-surface min-h-10 px-4 font-medium text-slate-700">{l}</button>
           ))}
         </div>
       </Card>
