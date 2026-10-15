@@ -23,8 +23,8 @@ export function DocHeader({ label, name, number, date = new Date() }) {
 }
 
 export const DocFooter = ({ number }) => (
-  <footer className="mt-6 flex items-center justify-between border-t border-slate-200 pt-3 text-[0.75rem] text-slate-400">
-    <span>Counted with ShrimpCount</span><span className="font-mono">{number}</span>
+  <footer className="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-200 pt-3 text-[0.75rem] text-slate-400">
+    <span>Counted with ShrimpCount</span><span className="whitespace-nowrap font-mono">{number}</span>
   </footer>
 )
 

@@ -129,8 +129,8 @@ export default function OrderDetail({ id, store, go }) {
                 </dl>
                 {steady && <p className="mt-3 text-[0.8125rem] text-slate-500">Between samples: <b className="text-slate-700">{steady.text}</b> ({st.cv.toFixed(1)}% spread).</p>}
                 {photos.length > 0 && (
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    {photos.map((p) => <img key={p.id} src={p.url} alt={`Counted tray, ${fmt(p.count)}`} className="w-full rounded-xl print:break-inside-avoid" />)}
+                  <div className={`mt-4 grid gap-3 ${photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                    {photos.map((p) => <img key={p.id} src={p.url} alt={`Counted tray, ${fmt(p.count)}`} className="w-full rounded-xl print:mx-auto print:max-h-[8cm] print:w-auto print:max-w-full print:break-inside-avoid" />)}
                   </div>
                 )}
                 {photos.length > 0 && <p className="mt-2 text-[0.75rem] text-slate-500">Counted samples from this batch. Each ring is one larva counted.</p>}
