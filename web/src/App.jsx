@@ -153,7 +153,7 @@ export default function App() {
   )
 
   return (
-    <div className="min-h-dvh bg-slate-100 text-slate-900">
+    <div className="min-h-dvh bg-slate-100 text-slate-900 print:bg-white">
       {!online && (
         <div role="status" className="sticky top-0 z-40 flex items-center justify-center gap-2 border-b border-white/[0.09] bg-amber-50 px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] text-center text-[0.8125rem] font-medium text-amber-900">
           <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />{t('offline_banner')}
@@ -164,7 +164,7 @@ export default function App() {
           {t('updated_banner')}
         </button>
       )}
-      <main key={route} className="page-in mx-auto max-w-2xl px-4 pb-32 pt-[max(1.25rem,env(safe-area-inset-top))]">{view}</main>
+      <main key={route} className="page-in mx-auto max-w-2xl px-4 pb-32 pt-[max(1.25rem,env(safe-area-inset-top))] print:max-w-none print:p-0">{view}</main>
       {toast && (
         <div role={toast.tone === 'error' ? 'alert' : 'status'} className="page-in fixed inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-50 mx-auto flex w-fit max-w-[92vw] items-center gap-2.5 rounded-xl bg-slate-900 px-4 py-3 text-[0.9375rem] font-medium text-on-accent">
           {toast.tone === 'error'

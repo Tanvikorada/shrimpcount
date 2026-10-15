@@ -26,9 +26,9 @@ export default function Report({ id, store, go }) {
     <>
       <div className="print:hidden">
         <PageHeader title={t('rp_title')} onBack={() => go(`/batch/${id}`)} />
-        <div className="mb-4 grid grid-cols-2 gap-3">
-          <Button onClick={() => window.print()}>{t('od_print')}</Button>
-          <Button variant="ghost" onClick={() => shareText(summary)}><Share width={18} />{t('od_share')}</Button>
+        <div className="mb-4 grid grid-cols-[1.35fr_1fr] gap-3">
+          <Button className="whitespace-nowrap px-3" onClick={() => window.print()}>{t('od_print')}</Button>
+          <Button variant="ghost" className="whitespace-nowrap px-3" onClick={() => shareText(summary)}><Share width={18} />{t('od_share')}</Button>
         </div>
       </div>
 
@@ -62,12 +62,12 @@ export default function Report({ id, store, go }) {
         </div>
 
         {photos.length > 0 && (
-          <section className="border-b border-slate-200 py-5 print:break-inside-avoid">
+          <section className="border-b border-slate-200 py-5 print:break-inside-avoid print:py-3">
             <h3 className="mb-3 text-[0.9375rem] font-bold text-slate-900">Counted photos</h3>
             <div className={`grid gap-3 ${photos.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
               {photos.map((p) => (
                 <figure key={p.id} className="print:break-inside-avoid">
-                  <img src={p.url} alt={`Counted tray, ${fmt(p.count)}`} className="w-full rounded-xl" />
+                  <img src={p.url} alt={`Counted tray, ${fmt(p.count)}`} className="w-full rounded-xl print:mx-auto print:max-h-[10cm] print:w-auto print:max-w-full" />
                 </figure>
               ))}
             </div>
@@ -76,20 +76,20 @@ export default function Report({ id, store, go }) {
         )}
 
         <table className="mt-5 w-full text-sm">
-          <thead><tr className="text-left text-xs uppercase tracking-wide text-slate-500"><th className="w-8 pb-2">#</th><th>Date and time</th><th>Type</th><th className="text-right">Count</th></tr></thead>
+          <thead><tr className="text-left text-xs uppercase tracking-wide text-slate-500"><th className="w-8 pb-2">#</th><th className="pb-2 pr-3">Date and time</th><th className="pb-2 pr-3">Type</th><th className="pb-2 text-right">Count</th></tr></thead>
           <tbody>
             {list.map((s, i) => (
               <tr key={s.id} className="border-t border-slate-100">
-                <td className="py-2 text-slate-500">{i + 1}</td>
-                <td>{docDate(s.timestamp)} · {docTime(s.timestamp)}</td>
-                <td>{s.method === 'ai' ? 'Photo count, checked' : 'Counted by hand'}</td>
-                <td className="text-right font-semibold tabular-nums">{fmt(s.count)}</td>
+                <td className="py-2 align-top text-slate-500">{i + 1}</td>
+                <td className="py-2 pr-3 align-top">{docDate(s.timestamp)} · {docTime(s.timestamp)}</td>
+                <td className="py-2 pr-3 align-top">{s.method === 'ai' ? 'Photo count, checked' : 'Counted by hand'}</td>
+                <td className="py-2 text-right align-top font-semibold tabular-nums">{fmt(s.count)}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        <section className="mt-6 rounded-2xl bg-slate-50 p-4 text-[0.8125rem] leading-relaxed text-slate-600 print:break-inside-avoid">
+        <section className="mt-6 rounded-2xl bg-slate-50 p-4 text-[0.8125rem] leading-relaxed text-slate-600 print:mt-3 print:p-3 print:break-inside-avoid">
           <div className="mb-1 font-semibold text-slate-800">How this was counted</div>
           Each count is from a photo of the sample in a standard tray. The app finds the larvae, and the operator checks the marks against the photo
           {added + removed > 0 ? ` (across these counts, ${added} larva${added === 1 ? ' was' : 'e were'} added and ${removed} removed by hand)` : ''}.

@@ -30,9 +30,9 @@ export const DocFooter = ({ number }) => (
 
 /** Signature lines. Each item: [caption, optional name printed under the line]. */
 export const SignBlock = ({ items }) => (
-  <div className={`mt-8 grid gap-8 text-[0.8125rem] text-slate-500 print:break-inside-avoid ${items.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+  <div className={`mt-8 grid gap-8 text-[0.8125rem] text-slate-500 print:mt-4 print:break-inside-avoid ${items.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
     {items.map(([caption, who]) => (
-      <div key={caption}><div className="h-12 border-b border-slate-400" />{caption}{who ? `: ${who}` : ''}</div>
+      <div key={caption}><div className="h-12 border-b border-slate-400 print:h-9" />{caption}{who ? `: ${who}` : ''}</div>
     ))}
   </div>
 )

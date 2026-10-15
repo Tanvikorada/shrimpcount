@@ -152,8 +152,9 @@ button { transition: transform 0.12s ease, background-color 0.15s ease, opacity 
 
 @page { size: A4; margin: 14mm; }
 @media print {
-  body { background: #fff; }
-  html { font-size: 12px; }
+  html, body { background: #fff !important; }
+  html, html[data-text] { font-size: 11px; }   /* print at one size, whatever the on-screen text size */
+  @page { size: A4; margin: 12mm; }
 }
 
 /* Telugu, Hindi and Tamil letters carry marks above and below the line: give every line more room so nothing is clipped */

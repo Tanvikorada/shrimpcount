@@ -18,7 +18,7 @@ export function steadiness(cv) {
 }
 
 export const fmtDate = (iso) => new Date(iso).toLocaleDateString(localeOf(), { day: 'numeric', month: 'short', year: 'numeric' })
-export const fmtTime = (iso) => new Date(iso).toLocaleTimeString(localeOf(), { hour: '2-digit', minute: '2-digit' })
+export const fmtTime = (iso) => new Date(iso).toLocaleTimeString(localeOf(), { hour: 'numeric', minute: '2-digit' })
 
 export function csv(batch, samples) {
   const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
@@ -41,5 +41,5 @@ export async function shareText(text) {
 
 // Customer documents (report, certificate, invoice) are always in English and English-format dates, whatever language the app is in.
 export const docDate = (iso) => new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-export const docTime = (iso) => new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+export const docTime = (iso) => new Date(iso).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })
 export const docSteadiness = (cv) => (cv <= 5 ? { text: 'Steady', tone: 'teal' } : cv <= 10 ? { text: 'Some variation', tone: 'amber' } : { text: 'Varies a lot', tone: 'amber' })

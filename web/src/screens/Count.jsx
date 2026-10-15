@@ -251,7 +251,7 @@ export default function Count({ batchId, store, go }) {
       const blob = await renderEvidence({
         url, width: size.width, height: size.height, count, outline: trayPx,
         marks: dets.filter((d, i) => !d.removed && inTray[i]).map((d) => ({ cx: d.cx, cy: d.cy, r: Math.max(d.r, r), added: d.added })),
-        title: `${batch.code} · ${species}`, subtitle: new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }), hatchery: store.settings.hatchery,
+        title: `${batch.code} · ${species}`, subtitle: new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }), hatchery: store.settings.hatchery,
       })
       if (blob) await evidencePut(row.id, blob)
     } catch { /* the count is saved either way */ }

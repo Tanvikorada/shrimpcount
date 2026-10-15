@@ -58,9 +58,9 @@ export default function OrderDetail({ id, store, go }) {
               className={`min-h-12 flex-1 rounded-xl text-[0.9375rem] font-semibold ${doc === k ? 'bg-surface text-teal-700' : 'text-slate-500'}`}>{l}</button>
           ))}
         </div>
-        <div className="mb-3 grid grid-cols-2 gap-3">
-          <Button onClick={() => window.print()}>{t('od_print')}</Button>
-          <Button variant="ghost" onClick={() => shareText(message)}><Share width={18} />{t('od_share')}</Button>
+        <div className="mb-3 grid grid-cols-[1.35fr_1fr] gap-3">
+          <Button className="whitespace-nowrap px-3" onClick={() => window.print()}>{t('od_print')}</Button>
+          <Button variant="ghost" className="whitespace-nowrap px-3" onClick={() => shareText(message)}><Share width={18} />{t('od_share')}</Button>
         </div>
         <div className="mb-4 flex flex-wrap gap-2">
           <Button variant="ghost" onClick={() => store.updateOrder(id, { status: o.status === 'pending' ? 'delivered' : 'pending' })}>
