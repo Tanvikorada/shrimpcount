@@ -44,7 +44,7 @@ export default function Trace({ id, store, go }) {
 
         <Section title={t('fl_batch')}>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-2">
-            {[[t('fl_code'), b.code], [t('tank_word'), b.tank || '–'], [t('fl_pl_stage'), b.plStage || '–'], [t('fl_spawn_date'), b.spawnDate ? fmtDate(b.spawnDate) : '–'], [t('fl_source'), b.source || '–'], [t('fl_status'), b.status]].map(([k, v]) => (
+            {[[t('fl_code'), b.code], [t('tank_word'), b.tank || '–'], [t('fl_pl_stage'), b.plStage || '–'], [t('fl_spawn_date'), b.spawnDate ? fmtDate(b.spawnDate) : '–'], [t('fl_source'), b.source || '–'], [t('fl_status'), b.status === 'closed' ? t('d_closed') : t('d_active')]].map(([k, v]) => (
               <div key={k}><dt className="text-xs text-slate-500">{k}</dt><dd className="font-medium">{v}</dd></div>))}
           </dl>
         </Section>
@@ -80,7 +80,7 @@ export default function Trace({ id, store, go }) {
           <div key={g.id} className="py-1"><span className="text-slate-500">{fmtDate(g.date)}</span> {t('tc_abw_line', { n: g.abw })}</div>))}</Section>}
 
         {orders.length > 0 && <Section title={t('tc_section_deliveries')}>{orders.map((o) => (
-          <div key={o.id} className="py-1">{o.customer} · {fmt(o.plQuantity)} {t('tc_pl_unit')}{o.date ? ` · ${fmtDate(o.date)}` : ''} · {o.status}</div>))}</Section>}
+          <div key={o.id} className="py-1">{o.customer} · {fmt(o.plQuantity)} {t('tc_pl_unit')}{o.date ? ` · ${fmtDate(o.date)}` : ''} · {o.status === 'delivered' ? t('o_delivered') : t('o_pending')}</div>))}</Section>}
 
         <footer className="pt-2 text-xs text-slate-500">{t('tc_footer')}</footer>
       </article>

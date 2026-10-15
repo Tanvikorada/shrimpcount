@@ -54,8 +54,10 @@ export const PageHeader = ({ title, sub, onBack, right }) => (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>{t('back')}
       </button>
     )}
-    <div className="flex items-end justify-between gap-3 border-b border-white/[0.09] pb-4">
-      <div className="min-w-0">
+    {/* the title never shrinks below its longest word; when it and the action cannot share a line (long Telugu or
+        Tamil words), the action drops below instead of sliding over the title */}
+    <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-3 border-b border-white/[0.09] pb-4">
+      <div className="min-w-min flex-[1_1_10rem]">
         <h1 className="font-display text-[1.875rem] font-medium leading-[1.1] tracking-[-0.03em] text-slate-900">{title}</h1>
         {sub && <p className="mt-1 text-[0.9375rem] text-slate-500">{sub}</p>}
       </div>
