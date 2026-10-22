@@ -16,7 +16,9 @@ function Spark({ values }) {
 }
 
 export default function Water({ store, go }) {
-  const { water, batches, settings } = store
+  const { batches, settings } = store
+  // newest reading first, by when it was taken (a restored or synced backup can arrive in any order)
+  const water = store.water.slice().sort((x, y) => (x.timestamp < y.timestamp ? 1 : -1))
   const [open, setOpen] = useState(false)
   const [tank, setTank] = useState('')
   const [batchId, setBatchId] = useState('')
@@ -76,7 +78,7 @@ export default function Water({ store, go }) {
           <Card className="mb-4 p-4">
             <div className="mb-2 flex flex-wrap gap-1.5" role="group" aria-label={t('wq_param_group')}>
               {PARAMS.map((p) => (
-                <button key={p.key} onClick={() => setParam(p.key)} className={`rounded-full border px-3 py-1 text-xs font-medium ${param === p.key ? 'border-teal-700 bg-teal-50 text-teal-900' : 'border-slate-300 text-slate-600'}`}>{t(p.labelKey)}</button>
+                <button key={p.key} onClick={() => setParam(p.key)} className={`min-h-10 rounded-full border px-3.5 text-[0.8125rem] font-medium ${param === p.key ? 'border-teal-700 bg-teal-50 text-teal-900' : 'border-slate-300 text-slate-600'}`}>{t(p.labelKey)}</button>
               ))}
             </div>
             <Spark values={series} />

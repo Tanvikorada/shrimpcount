@@ -69,5 +69,11 @@
         }
       ]
     }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://shrimpcount-ai.vercel.app/manifest.webmanifest"
+    }
   ]
 }

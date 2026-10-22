@@ -32,16 +32,37 @@ document.querySelectorAll("[data-mail]").forEach((a) => { a.href = MAILTO; });
   select.addEventListener("change", () => { store.set("sc-lang", select.value); apply(select.value); });
 })();
 
-// The app lives at /app/ on this same site. Chrome can install it straight from this page; iPhone gets the steps.
+// The app lives at /app/ on this same site. Install never leaves this page: Chrome's own install dialog when it has
+// offered one, otherwise a sheet with the steps, or, when the app is already on this device, a note saying so.
+// (Chrome offers its dialog a few seconds after the page opens, and never again once the app is installed.)
 (() => {
   let prompt = null;
-  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); prompt = e; });
+  let installed = store.get("sc-installed") === "1";
   const sheet = document.getElementById("ios-sheet");
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); prompt = e; installed = false; store.set("sc-installed", "0"); });
+  window.addEventListener("appinstalled", () => { prompt = null; installed = true; store.set("sc-installed", "1"); });
+  // Chrome on Android can tell us the app is already installed, even in a fresh browser session
+  if (navigator.getInstalledRelatedApps) navigator.getInstalledRelatedApps().then((a) => { if (a.length) installed = true; }).catch(() => {});
+  const waitForPrompt = (ms) => new Promise((done) => {
+    if (prompt) return done();
+    const t = setTimeout(done, ms);
+    window.addEventListener("beforeinstallprompt", () => { clearTimeout(t); done(); }, { once: true });
+  });
+  const showSheet = () => {
+    sheet.dataset.mode = installed ? "installed" : ios ? "ios" : "android";
+    sheet.showModal();
+  };
   document.querySelectorAll("[data-install]").forEach((b) => b.addEventListener("click", async () => {
-    if (prompt) { const p = prompt; prompt = null; await p.prompt(); return; }
-    if (ios) { sheet.showModal(); return; }
-    window.location.href = "/app/";
+    if (!prompt && !installed && !ios) await waitForPrompt(1500);
+    if (prompt) {
+      const p = prompt; prompt = null;
+      await p.prompt();
+      const r = await p.userChoice.catch(() => ({ outcome: "dismissed" }));
+      if (r.outcome === "accepted") { installed = true; store.set("sc-installed", "1"); }
+      return;
+    }
+    showSheet();
   }));
   sheet.querySelector("[data-close]").addEventListener("click", () => sheet.close());
   sheet.addEventListener("click", (e) => { if (e.target === sheet) sheet.close(); });
