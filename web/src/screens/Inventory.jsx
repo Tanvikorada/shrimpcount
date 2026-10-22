@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, Empty, Button, Field, PageHeader, Badge } from '../components/ui'
 import { fmt } from '../lib/format'
 import { t } from '../lib/i18n'
+import { tap } from '../lib/haptics'
 
 const low = (i) => i.reorderAt !== '' && i.reorderAt != null && Number(i.qty) <= Number(i.reorderAt)
 
@@ -47,19 +48,24 @@ export default function Inventory({ store, go }) {
         <div className="space-y-3">
           {items.map((i) => (
             <Card key={i.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 text-base font-semibold">{i.name}{low(i) && <Badge tone="amber">{t('inv_low_badge')}</Badge>}</div>
                   <div className="text-xs text-slate-500">{i.reorderAt !== '' && i.reorderAt != null ? t('inv_alert_at', { n: fmt(i.reorderAt), unit: i.unit }) : t('inv_no_alert')}</div>
                 </div>
                 <div className="text-right"><div className="text-2xl font-semibold tabular-nums">{fmt(i.qty)}</div><div className="text-xs text-slate-500">{i.unit}</div></div>
               </div>
-              <div className="mt-3 flex items-center gap-2">
-                <input aria-label={t('inv_amount_aria', { name: i.name })} type="number" step="any" inputMode="decimal" value={amt[i.id] ?? ''} onChange={(e) => setAmt({ ...amt, [i.id]: e.target.value })}
-                  placeholder={t('inv_amount_ph')} className="w-24 rounded-lg ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-teal-600 px-2.5 py-1.5 text-sm" />
-                <Button variant="ghost" className="px-3 py-1.5" onClick={() => adjust(i, +1)}>{t('inv_received')}</Button>
-                <Button variant="ghost" className="px-3 py-1.5" onClick={() => adjust(i, -1)}>{t('inv_used')}</Button>
-                <button className="ml-auto min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label={t('inv_delete_aria', { name: i.name })} onClick={() => confirm(t('inv_delete_confirm', { name: i.name })) && store.removeItem('inventory', i.id)}>{t('delete')}</button>
+              {/* the amount on its own line with delete; then two equal buttons to book it in or out */}
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <input aria-label={t('inv_amount_aria', { name: i.name })} type="number" step="any" inputMode="decimal" value={amt[i.id] ?? ''} onChange={(e) => setAmt({ ...amt, [i.id]: e.target.value })}
+                  placeholder={t('inv_amount_ph')} className="min-h-11 min-w-0 flex-1 rounded-lg ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-teal-600 px-2.5 text-sm" />
+                  <button className="min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label={t('inv_delete_aria', { name: i.name })} onClick={() => confirm(t('inv_delete_confirm', { name: i.name })) && store.removeItem('inventory', i.id)}>{t('delete')}</button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" className="min-h-11 min-w-0 rounded-2xl bg-slate-200 px-2 text-[0.875rem] font-semibold leading-tight [overflow-wrap:anywhere] text-slate-900 ring-1 ring-slate-300 active:bg-slate-300" onClick={() => { tap(); adjust(i, +1) }}>{t('inv_received')}</button>
+                  <button type="button" className="min-h-11 min-w-0 rounded-2xl bg-slate-200 px-2 text-[0.875rem] font-semibold leading-tight [overflow-wrap:anywhere] text-slate-900 ring-1 ring-slate-300 active:bg-slate-300" onClick={() => { tap(); adjust(i, -1) }}>{t('inv_used')}</button>
+                </div>
               </div>
             </Card>
           ))}

@@ -57,8 +57,10 @@ export default function Tasks({ store, go }) {
             const overdue = !k.done && k.due && k.due < today
             return (
               <div key={k.id} className="flex items-start gap-3 p-3">
-                <input type="checkbox" checked={k.done} onChange={() => complete(k)} aria-label={t('tsk_mark_aria', { title: k.title, state: k.done ? t('tsk_mark_open') : t('tsk_mark_done') })} className="mt-1 h-5 w-5 accent-teal-700" />
-                <div className="flex-1">
+                <label className="-m-2.5 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center">
+                  <input type="checkbox" checked={k.done} onChange={() => complete(k)} aria-label={t('tsk_mark_aria', { title: k.title, state: k.done ? t('tsk_mark_open') : t('tsk_mark_done') })} className="h-6 w-6 accent-teal-700" />
+                </label>
+                <div className="min-w-0 flex-1">
                   <div className={`text-sm font-medium ${k.done ? 'text-slate-400 line-through' : ''}`}>{k.title}</div>
                   <div className="flex flex-wrap items-center gap-x-2 text-xs text-slate-500">
                     {k.assignee && <span>{k.assignee}</span>}
@@ -68,7 +70,7 @@ export default function Tasks({ store, go }) {
                     {overdue && <Badge tone="amber">{t('tsk_overdue_badge')}</Badge>}
                   </div>
                 </div>
-                {!k.done && <button aria-label={t('tsk_share_aria')} className="text-slate-500" onClick={() => shareText(`${t('tsk_share_task', { title: k.title })}${k.assignee ? t('tsk_share_assigned', { name: k.assignee }) : ''}${k.due ? t('tsk_share_due', { date: fmtDate(k.due) }) : ''}`)}><Share width={18} /></button>}
+                {!k.done && <button aria-label={t('tsk_share_aria')} className="-my-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-500 active:bg-slate-100" onClick={() => shareText(`${t('tsk_share_task', { title: k.title })}${k.assignee ? t('tsk_share_assigned', { name: k.assignee }) : ''}${k.due ? t('tsk_share_due', { date: fmtDate(k.due) }) : ''}`)}><Share width={18} /></button>}
                 <button className="min-h-11 min-w-11 shrink-0 rounded-xl px-2 text-[0.8125rem] font-semibold text-red-700 active:bg-red-50" aria-label={t('tsk_delete_aria')} onClick={() => confirm(t('tsk_delete_confirm')) && store.removeItem('tasks', k.id)}>{t('delete')}</button>
               </div>
             )
