@@ -26,7 +26,12 @@ CONF = float(os.environ.get("CONF", "0.25"))
 MAX_BYTES = 15 * 1024 * 1024
 
 app = FastAPI(title="ShrimpCount API", version="0.1.0")
-app.add_middleware(CORSMiddleware, allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+# Only our own sites (and a developer's localhost) may call this from a browser. This stops other websites using a
+# visitor's browser to run our counter; it does not stop a script that calls the API directly. Set CORS_ORIGINS
+# (comma-separated, or "*") to override.
+_ORIGINS = os.environ.get("CORS_ORIGINS", "https://shrimpcount-ai.vercel.app,https://shrimpcount-app.vercel.app").split(",")
+app.add_middleware(CORSMiddleware, allow_origins=_ORIGINS,
+                   allow_origin_regex=r"^http://(localhost|127[.]0[.]0[.]1)(:[0-9]+)?$",
                    allow_methods=["*"], allow_headers=["*"])
 
 _session = None

@@ -78,3 +78,13 @@ def test_a_malformed_prior_falls_back_to_the_preset_instead_of_failing():
     r = client.post("/count?prior=not-json", files={"file": jpeg(tray(5))})
     assert r.status_code == 200
     assert r.json()["tray_fit"] is not None
+
+
+def test_only_our_own_sites_may_call_the_api_from_a_browser():
+    ours = client.get("/health", headers={"Origin": "https://shrimpcount-ai.vercel.app"})
+    assert ours.headers.get("access-control-allow-origin") == "https://shrimpcount-ai.vercel.app"
+    local = client.get("/health", headers={"Origin": "http://localhost:5180"})
+    assert local.headers.get("access-control-allow-origin") == "http://localhost:5180"
+    other = client.get("/health", headers={"Origin": "https://some-other-site.example"})
+    assert "access-control-allow-origin" not in other.headers
+    assert "access-control-allow-origin" not in client.get("/health", headers={"Origin": "http://localhost.evil.example"}).headers
