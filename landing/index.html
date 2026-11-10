@@ -242,12 +242,13 @@
       <div class="wrap acc-grid">
         <div>
           <p class="eyebrow" data-i18n="lp_acc_h">Honest about accuracy</p>
-          <p class="acc-big">Within <span class="grad">1%</span> of an 1,800 hand count.</p>
-          <p class="acc-sub" data-i18n="lp_acc_c">We are still testing other PL stages with hatcheries. Until you have compared it with your own hand count on your own trays, treat the number as an estimate.</p>
+          <p class="acc-big" data-i18n="lp_acc_big">Three trays tested. Every result, shown.</p>
+          <p class="acc-sub" data-i18n="lp_acc_c">It reads low where larvae overlap in a packed tray. Three trays is too few to promise an accuracy figure, so we are testing more with hatcheries. Compare it with your own hand count on your own trays before you rely on it.</p>
         </div>
-        <div class="gauge" aria-hidden="true">
-          <svg viewBox="0 0 200 200"><circle class="g-track" cx="100" cy="100" r="84"/><circle class="g-fill" id="g-fill" cx="100" cy="100" r="84"/></svg>
-          <div class="g-center"><p class="g-num"><span id="g-num">0</span>%</p><p class="g-lbl">agreement on a PL14 tray</p></div>
+        <div class="acc-results">
+          <div class="acc-row"><span data-i18n="lp_acc_r1">PL14 tray, hand count 1,800</span><b class="ok">+0.5%</b></div>
+          <div class="acc-row"><span data-i18n="lp_acc_r2">PL12 tray, known count 1,797</span><b>&minus;3.7%</b></div>
+          <div class="acc-row"><span data-i18n="lp_acc_r3">PL9-like tray, known count 1,750</span><b>&minus;13%</b></div>
         </div>
       </div>
     </section>
@@ -297,7 +298,7 @@
           <details><summary><span>Does it count a whole tank?</span><i class="ph ph-plus"></i></summary><p>No. It counts the sample on a standard tray. A batch of samples gives the tank estimate.</p></details>
           <details><summary><span>I am a farmer. What do I get?</span><i class="ph ph-plus"></i></summary><p>Your hatchery can send the marked photo, the count report and the delivery certificate with your seed. You install nothing.</p></details>
           <details><summary><span>How does the counter work?</span><i class="ph ph-plus"></i></summary><p>It finds the tray, removes the background, and looks for the dark head spot of each post-larva, since the body is almost transparent. Noise and faint tails are filtered by size and contrast, clumps are split by expected size for the PL stage, and a person confirms the marks. A classical OpenCV engine runs today; a YOLO11 detector (ONNX) must beat it on the same held-out batches before it ships.</p></details>
-          <details><summary><span>How is accuracy measured?</span><i class="ph ph-plus"></i></summary><p>Data is split by batch, never by random image, so the test set is a day the model has not seen. Only numbers from the evaluation script on held-out batches are quoted. No synthetic images stand in for real hatchery photos.</p></details>
+          <details><summary><span>How is accuracy measured?</span><i class="ph ph-plus"></i></summary><p>Against a known count for the same tray: a hand count, or a count the hatchery gave us. So far that is three trays, and one of them (the PL14 tray) is the one the large-larva setting was tuned on, so its result is flattering. Packed trays read lower. The proper test is two people hand-counting 15 to 30 of your own trays, and we will run it with you.</p></details>
           <details><summary><span>What is it built with?</span><i class="ph ph-plus"></i></summary><p>An offline-first React PWA, a FastAPI counting service, OpenCV and ONNX Runtime. This page uses three.js and GSAP.</p></details>
         </div>
       </div>

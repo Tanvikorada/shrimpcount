@@ -251,15 +251,14 @@ html:not([lang="en"]) h1, html:not([lang="en"]) h2 { letter-spacing: 0; line-hei
 .acc::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 0%, rgb(11 14 16 / .6) 60%, rgb(11 14 16 / .35) 100%); }
 .acc .wrap { position: relative; z-index: 1; }
 .acc-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(40px, 6vw, 90px); align-items: center; }
-.acc-big { margin-top: 20px; font: 800 clamp(2.8rem, 6.4vw, 6rem)/.95 var(--display); letter-spacing: -0.05em; max-width: 14ch; }
+.acc-big { margin-top: 20px; font: 800 clamp(2.4rem, 5vw, 4.6rem)/1 var(--display); letter-spacing: -0.045em; max-width: 16ch; }
 .acc-sub { margin-top: 26px; color: var(--ink-2); max-width: 54ch; }
-.gauge { position: relative; width: min(340px, 80vw); aspect-ratio: 1; justify-self: center; }
-.gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.g-track { fill: none; stroke: rgb(243 242 237 / .08); stroke-width: 10; }
-.g-fill { fill: none; stroke: url(#none); stroke: var(--accent); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 527.8; stroke-dashoffset: 527.8; filter: drop-shadow(0 0 12px rgb(63 214 198 / .6)); }
-.g-center { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
-.g-num { font: 800 clamp(3.4rem, 7vw, 5rem)/1 var(--display); letter-spacing: -0.05em; }
-.g-lbl { margin-top: 8px; font-size: 13px; color: var(--ink-2); max-width: 16ch; }
+.acc-results { display: grid; gap: 0; align-self: center; }
+.acc-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 22px 0; border-top: 1px solid var(--line); }
+.acc-row:last-child { border-bottom: 1px solid var(--line); }
+.acc-row span { color: var(--ink-2); max-width: 22ch; }
+.acc-row b { font: 800 clamp(2rem, 4vw, 3.2rem)/1 var(--display); letter-spacing: -0.04em; color: #FF8A6A; white-space: nowrap; }
+.acc-row b.ok { color: var(--accent); }
 @media (max-width: 860px) { .acc-grid { grid-template-columns: 1fr; } }
 
 /* PRICING: a slowly turning glow on the card edge */

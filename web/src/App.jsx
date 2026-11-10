@@ -10,6 +10,7 @@ import BatchDetail from './screens/BatchDetail'
 import Count from './screens/Count'
 import Report from './screens/Report'
 import Settings from './screens/Settings'
+import About from './screens/About'
 import { OrderList, NewOrder } from './screens/Orders'
 import OrderDetail from './screens/OrderDetail'
 import Trace from './screens/Trace'
@@ -136,6 +137,7 @@ export default function App() {
   else if (a === 'access') view = <Access store={store} go={go} />
   else if (a === 'counts') view = <Counts store={store} go={go} />
   else if (a === 'more') view = <More store={store} go={go} />
+  else if (a === 'about') view = <About go={go} />
   else if (a === 'tools') view = <Tools go={go} />
   else if (a === 'water') view = <Water store={store} go={go} />
   else if (a === 'inventory') view = <Inventory store={store} go={go} />
@@ -183,7 +185,7 @@ export default function App() {
             {tab('/', t('nav_home'), HomeIcon, route === '/')}
             {tab('/batches', t('nav_batches'), Layers, a === 'batches' || a === 'batch' || a === 'report' || a === 'trace')}
             {tab('/orders', t('nav_orders'), Cart, a === 'orders' || a === 'order')}
-            {tab('/more', t('nav_more'), MoreIcon, ['more', 'tools', 'water', 'inventory', 'tasks', 'settings', 'prices', 'growth', 'counts', 'account'].includes(a))}
+            {tab('/more', t('nav_more'), MoreIcon, ['more', 'about', 'tools', 'water', 'inventory', 'tasks', 'settings', 'prices', 'growth', 'counts', 'account'].includes(a))}
           </div>
         </nav>
       )}

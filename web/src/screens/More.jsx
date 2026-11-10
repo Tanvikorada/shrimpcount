@@ -12,15 +12,16 @@ const core = (cloud) => [
   ...(cloudConfigured ? [['/account', t('acc_title'), cloud.user && cloud.hatchery ? `${cloud.hatchery.name} · ${statusText(cloud)}` : t('acc_banner_body')]] : []),
   ['/counts', t('m_history'), t('m_history_body')],
   ['/settings', t('m_settings'), t('m_settings_body')],
+  ['/about', t('ab_title'), t('ab_row_body')],
 ]
 
-const EXTRAS = [
-  ['/water', 'Water quality', 'Log readings per tank, see trends and out-of-range alerts'],
-  ['/inventory', 'Inventory', 'Feed, artemia, chemicals, with low-stock warnings'],
-  ['/tasks', 'Tasks and work log', 'Assign work to staff and keep a record of what was done'],
-  ['/growth', 'Growth', 'Body-weight samples and a simple projection to target size'],
-  ['/prices', 'Shrimp prices', 'Log prices by size count and watch the trend'],
-  ['/tools', 'Calculators', 'Survival rate, tank volume, daily feed, FCR, tank estimate'],
+const extras = () => [
+  ['/water', t('wq_title'), t('mx_water_b')],
+  ['/inventory', t('inv_title'), t('mx_inv_b')],
+  ['/tasks', t('tsk_title'), t('mx_tsk_b')],
+  ['/growth', t('gr_title'), t('mx_gr_b')],
+  ['/prices', t('mx_pr_t'), t('mx_pr_b')],
+  ['/tools', t('cx_title'), t('mx_tools_b')],
 ]
 
 function LabelExport() {
@@ -74,7 +75,7 @@ export default function More({ store, go }) {
         </label>
       </Card>
 
-      {on && <div className="mt-3 space-y-3">{EXTRAS.map(row)}</div>}
+      {on && <div className="mt-3 space-y-3">{extras().map(row)}</div>}
     </>
   )
 }

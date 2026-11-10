@@ -148,15 +148,10 @@ if (gsap && ScrollTrigger && !reduce) {
     const to = Number(el.dataset.to); const o = { v: to === 0 ? 5 : 0 };
     gsap.to(o, { v: to, duration: 1.4, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onUpdate: () => { el.textContent = String(Math.round(o.v)); } });
   });
-  const gf = document.getElementById("g-fill"), gn = document.getElementById("g-num");
-  const g = { v: 0 };
-  gsap.to(g, { v: 99, duration: 2.2, ease: "power3.out", scrollTrigger: { trigger: ".gauge", start: "top 80%", once: true }, onUpdate: () => { gf.style.strokeDashoffset = String(527.8 * (1 - g.v / 100)); gn.textContent = String(Math.round(g.v)); } });
-  gsap.utils.toArray(".stat, .gain-col, .app-copy > *, .chips span, .acc-grid > div > *, .pricing .wrap > *, .faq h2, .final h2").forEach((el, i) => {
+  gsap.utils.toArray(".stat, .gain-col, .app-copy > *, .chips span, .acc-grid > div > *, .acc-row, .pricing .wrap > *, .faq h2, .final h2").forEach((el, i) => {
     gsap.from(el, { y: 40, opacity: 0, duration: 1, ease: "power3.out", delay: (i % 6) * 0.04, scrollTrigger: { trigger: el, start: "top 90%", once: true } });
   });
 } else {
-  document.getElementById("g-fill").style.strokeDashoffset = String(527.8 * 0.01);
-  document.getElementById("g-num").textContent = "99";
   document.querySelectorAll(".count-up").forEach((el) => { el.textContent = el.dataset.to; });
 }
 
