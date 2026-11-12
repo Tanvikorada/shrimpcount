@@ -135,6 +135,8 @@ async def count(
     data = await file.read()
     if len(data) > MAX_BYTES:
         raise HTTPException(413, "Image too large (max 15 MB).")
+    if not data:
+        raise HTTPException(400, "Could not read image.")
     img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
     if img is None:
         raise HTTPException(400, "Could not read image.")

@@ -116,3 +116,6 @@ def test_an_image_with_an_absurd_pixel_count_is_refused_before_it_is_counted():
     finally:
         m.MAX_PIXELS = old
 
+
+def test_an_empty_upload_is_a_clean_400_not_a_crash():
+    assert client.post("/count", files={"file": ("a.jpg", io.BytesIO(b""), "image/jpeg")}).status_code == 400
