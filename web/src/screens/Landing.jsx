@@ -71,7 +71,7 @@ export default function Landing({ store, entered, installed }) {
   const open = () => { if (!installed) { scrollToApp(); return } if (entered) go('/'); else start() }
   const btn = 'inline-flex min-h-14 items-center justify-center rounded-xl px-6 text-[1.0625rem] font-medium'
   return (
-    <div className="min-h-dvh text-slate-900" style={{ background: 'repeating-linear-gradient(135deg,#fff 0 7px,#f0f1f3 7px 8px)' }}>
+    <main className="min-h-dvh text-slate-900" style={{ background: 'repeating-linear-gradient(135deg,#fff 0 7px,#f0f1f3 7px 8px)' }}>
       <div className="mx-auto max-w-5xl border-x border-white/[0.09] bg-surface">
         {/* top bar */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-2 border-b border-white/[0.09] bg-surface/95 px-4 backdrop-blur">
@@ -174,7 +174,7 @@ export default function Landing({ store, entered, installed }) {
         <section className={`${rule} bg-slate-900 px-5 py-16 text-on-accent`}>
           <Tag><span className="text-on-accent/80">{t('lp_acc_h')}</span></Tag>
           <p className="font-display mt-5 max-w-3xl text-[1.625rem] font-medium leading-snug tracking-[-0.02em] md:text-[2rem]">{t('lp_acc_b')}</p>
-          <p className="mt-5 max-w-3xl text-[0.9375rem] leading-relaxed text-on-accent/60">{t('lp_acc_c')}</p>
+          <p className="mt-5 max-w-3xl text-[0.9375rem] leading-relaxed text-on-accent/80">{t('lp_acc_c')}</p>
         </section>
 
         {/* faq */}
@@ -198,6 +198,6 @@ export default function Landing({ store, entered, installed }) {
         </section>
         <footer className={`${rule} px-5 py-8 text-center text-[0.8125rem] text-slate-500`}>{t('lp_foot')}</footer>
       </div>
-    </div>
+    </main>
   )
 }
