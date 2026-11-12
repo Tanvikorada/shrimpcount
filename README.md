@@ -58,7 +58,7 @@ Built and tested (15 Python tests, 8 JS tests, production build, browser-checked
 - Counting API: https://shrimpcount-api.vercel.app (`/health`, `POST /count`), classical engine only, no model, no data stored
 - Test build only. Records live in each phone's browser (Settings > Backup). The API is open (CORS `*`) and unauthenticated.
 - Redeploy the API: `python scripts/prepare_api_deploy.py`, then `cd deploy/api && npx vercel deploy --prod --yes`
-- Redeploy the app: build it into the website (see `landing/README.md`, v5), then `cd landing && npx vercel deploy --prod --yes`. Do NOT deploy from `web/`: that folder is still linked to the old project and would replace the redirect.
+- Redeploy the app: build it into the website (see `landing/README.md`, v5; it needs `web/.env.production.local` or the build has no sign-in), then `cd landing && npx vercel deploy --prod --yes`. Do NOT deploy from `web/`: that folder is still linked to the old project and would replace the redirect.
 - Phone photos are shrunk (only the copy sent for counting) to fit Vercel's 4.5 MB request limit; originals are kept.
 - Local `.vercel/` and `.env.local` files are created by the CLI and must not be shared.
 

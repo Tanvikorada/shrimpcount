@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { syncOnce } from './cloudEngine'
 import { applyRemote, getState, subscribeStore } from './store'
-import { evidenceGet, evidenceKeys, setEvidenceFallback } from './evidence'
+import { evidenceGet, evidenceKeys, setEvidenceCloudRemove, setEvidenceFallback } from './evidence'
 
 const URL = import.meta.env.VITE_SUPABASE_URL
 const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -126,6 +126,12 @@ async function syncPhotos(h) {
   }
   return todo.length > 8
 }
+setEvidenceCloudRemove(async (id) => {
+  if (!view.user || !view.hatchery || !navigator.onLine) return
+  const sb = await client()
+  await sb.storage.from('evidence').remove([`${view.hatchery.id}/${id}.jpg`])
+  write(UP_KEY, read(UP_KEY, []).filter((x) => x !== id))
+})
 setEvidenceFallback(async (id) => {
   if (!view.user || !view.hatchery || !navigator.onLine) return null
   const sb = await client()

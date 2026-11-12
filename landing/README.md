@@ -32,5 +32,11 @@ The app is built into `app/` and served at `/app/`:
 
     cd web && MSYS_NO_PATHCONV=1 VITE_BASE=/app/ VITE_API_URL=https://shrimpcount-api.vercel.app npx vite build --outDir ../landing/app --emptyOutDir
 
+**Accounts and backup are compiled in at build time.** Vite reads `web/.env.production.local` (git-ignored; it holds `VITE_API_URL`,
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`), so the command above picks them up by itself. If that file is missing the app builds
+fine but silently has NO sign-in and NO backup (this happened once, 2026-09-26 to 2026-11-12). After building, check:
+`grep -l gqixvanhkytgoscohhbj landing/app/assets/*.js` must print a file. The URL and anon key are public by design; get them again
+from the Supabase dashboard (Project Settings > API) if the file is lost.
+
 Then `cd landing && npx vercel deploy --prod --yes`. The root `manifest.webmanifest` points at `/app/`, so Install works from the homepage.
 The page code is in `site.js` (three.js hero, GSAP + Lenis). `media/layers/` holds real processing stages of the tray image.

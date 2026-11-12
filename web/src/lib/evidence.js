@@ -22,7 +22,10 @@ const tx = async (mode, fn, store = STORE) => {
 }
 
 export const evidencePut = (id, blob) => tx('readwrite', (s) => s.put(blob, id)).catch(() => {})
-export const evidenceRemove = (id) => tx('readwrite', (s) => s.delete(id)).catch(() => {})
+// When a count is deleted its backed-up photo goes too (registered by cloud.js; does nothing without an account).
+let cloudRemove = null
+export const setEvidenceCloudRemove = (fn) => { cloudRemove = fn }
+export const evidenceRemove = (id) => { cloudRemove?.(id)?.catch?.(() => {}); return tx('readwrite', (s) => s.delete(id)).catch(() => {}) }
 // Corrected marks (a small JSON label) and the plain photo they belong to, kept on this phone for the accuracy export.
 export const labelPut = (id, label, photo) => Promise.all([tx('readwrite', (s) => s.put(label, id), 'labels'), tx('readwrite', (s) => s.put(photo, id), 'originals')]).catch(() => {})
 export const labelRemove = (id) => Promise.all([tx('readwrite', (s) => s.delete(id), 'labels'), tx('readwrite', (s) => s.delete(id), 'originals')]).catch(() => {})
