@@ -88,3 +88,31 @@ def test_only_our_own_sites_may_call_the_api_from_a_browser():
     other = client.get("/health", headers={"Origin": "https://some-other-site.example"})
     assert "access-control-allow-origin" not in other.headers
     assert "access-control-allow-origin" not in client.get("/health", headers={"Origin": "http://localhost.evil.example"}).headers
+
+
+def test_one_caller_cannot_flood_the_counter():
+    import api.main as m
+    old = m.RATE_PER_MINUTE
+    m.RATE_PER_MINUTE = 3
+    m._hits.clear()
+    try:
+        small = np.full((64, 64, 3), 200, np.uint8)
+        codes = [client.post("/count", files={"file": jpeg(small)}, headers={"x-forwarded-for": "9.9.9.9"}).status_code for _ in range(5)]
+        assert codes[:3] == [200, 200, 200] and codes[3:] == [429, 429]
+        other = client.post("/count", files={"file": jpeg(small)}, headers={"x-forwarded-for": "8.8.8.8"})
+        assert other.status_code == 200                      # a different caller is not affected
+    finally:
+        m.RATE_PER_MINUTE = old
+        m._hits.clear()
+
+
+def test_an_image_with_an_absurd_pixel_count_is_refused_before_it_is_counted():
+    import api.main as m
+    old = m.MAX_PIXELS
+    m.MAX_PIXELS = 1000
+    m._hits.clear()
+    try:
+        assert client.post("/count", files={"file": jpeg(np.full((64, 64, 3), 200, np.uint8))}).status_code == 413
+    finally:
+        m.MAX_PIXELS = old
+

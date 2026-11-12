@@ -21,15 +21,37 @@ async function shrink(file) {
   throw new Error('Photo is too large to send. Try a lower camera resolution.')
 }
 
+const RETRY_AFTER = [1200, 3000]       // a dropped connection or a busy server is retried twice before giving up
+const TIMEOUT_MS = 45000
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+// One request, retried when the connection drops or the server briefly fails; never retried when it said no (bad photo, rate limit).
+async function post(url, body) {
+  for (let attempt = 0; ; attempt++) {
+    const ctl = new AbortController()
+    const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS)
+    try {
+      const res = await fetch(url, { method: 'POST', body, signal: ctl.signal })
+      if (res.ok) return await res.json()
+      if (res.status === 429) throw Object.assign(new Error('busy'), { code: 'busy' })
+      const retryable = res.status === 502 || res.status === 503 || res.status === 504
+      if (!retryable || attempt >= RETRY_AFTER.length) throw new Error((await res.json().catch(() => ({}))).detail || `Server error ${res.status}`)
+    } catch (err) {
+      if (err.code === 'busy') throw err
+      if (err.name === 'AbortError') { if (attempt >= RETRY_AFTER.length) throw Object.assign(new Error('slow'), { code: 'slow' }) }
+      else if (!(err instanceof TypeError) || attempt >= RETRY_AFTER.length) throw err     // TypeError = no connection
+    } finally { clearTimeout(timer) }
+    await sleep(RETRY_AFTER[attempt])
+  }
+}
+
 export async function countImage(file, size = 'small', prior = null) {
   const { blob, scale, width, height } = await shrink(file)
   const body = new FormData()
   body.append('file', blob, file.name || 'sample.jpg')
   const q = new URLSearchParams({ size })
   if (prior?.length >= 3) q.set('prior', JSON.stringify(prior))
-  const res = await fetch(`${API}/count?${q}`, { method: 'POST', body })
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || `Server error ${res.status}`)
-  const data = await res.json()
+  const data = await post(`${API}/count?${q}`, body)
   if (scale !== 1) {
     data.detections = data.detections.map((d) => ({ ...d, x1: d.x1 * scale, y1: d.y1 * scale, x2: d.x2 * scale, y2: d.y2 * scale }))
     data.image_size = { width, height }

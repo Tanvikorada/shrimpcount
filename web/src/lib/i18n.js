@@ -134,6 +134,7 @@ export const DICT = {
     zoom_hint: 'Pinch to zoom, drag to move',
     err_offline: 'No connection to the counting service. Count by tapping each larva. The photo is kept, and the automatic check will run when you are back online.',
     err_failed: 'Automatic counting failed ({msg}). Tap each larva to count by hand.',
+    err_busy: 'Too many photos counted in a short time. Wait half a minute and take the photo again, or count by tapping each larva.',
     saved_toast: 'Saved. {n} counted.',
     save_failed_toast: "Couldn't save. Check your storage space and try again - nothing is lost.",
 
@@ -445,6 +446,7 @@ export const DICT = {
     zoom_hint: 'రెండు వేళ్లతో జూమ్ చేయండి, లాగి కదపండి',
     err_offline: 'కౌంటింగ్ సేవకు కనెక్షన్ లేదు. ప్రతి లార్వాను తాకి లెక్కించండి. ఫోటో భద్రంగా ఉంటుంది, సిగ్నల్ వచ్చాక ఆటోమేటిక్ తనిఖీ జరుగుతుంది.',
     err_failed: 'ఆటోమేటిక్ కౌంటింగ్ విఫలమైంది ({msg}). ప్రతి లార్వాను తాకి చేతితో లెక్కించండి.',
+    err_busy: 'తక్కువ సమయంలో చాలా ఫోటోలు లెక్కించారు. అర నిమిషం ఆగి ఫోటో మళ్ళీ తీయండి, లేదా ప్రతి లార్వాను తాకి లెక్కించండి.',
     saved_toast: 'సేవ్ అయింది. {n} లెక్కించాం.',
     save_failed_toast: 'సేవ్ కాలేదు. మీ స్టోరేజ్ స్థలం చూసి మళ్ళీ ప్రయత్నించండి - ఏమీ పోలేదు.',
 
@@ -756,6 +758,7 @@ export const DICT = {
     zoom_hint: 'दो उँगलियों से ज़ूम करें, खींचकर हिलाएँ',
     err_offline: 'गिनती सेवा से कनेक्शन नहीं है। हर लार्वा पर टैप करके गिनें। फोटो सुरक्षित रहेगी और सिग्नल आने पर अपने आप जाँची जाएगी।',
     err_failed: 'अपने आप गिनती नहीं हो पाई ({msg})। हर लार्वा पर टैप करके हाथ से गिनें।',
+    err_busy: 'थोड़े समय में बहुत सारी फ़ोटो गिनी गईं। आधा मिनट रुककर फ़ोटो फिर से लें, या हर लार्वा पर टैप करके गिनें।',
     saved_toast: 'सेव हो गया। {n} गिने गए।',
     save_failed_toast: 'सेव नहीं हुआ। अपनी स्टोरेज जगह देखें और फिर से कोशिश करें - कुछ भी नहीं खोया।',
 
@@ -1067,6 +1070,7 @@ export const DICT = {
     zoom_hint: 'இரு விரல்களால் பெரிதாக்குங்கள், இழுத்து நகர்த்துங்கள்',
     err_offline: 'எண்ணும் சேவையுடன் இணைப்பு இல்லை. ஒவ்வொரு லார்வாவையும் தொட்டு எண்ணுங்கள். புகைப்படம் பாதுகாப்பாக இருக்கும், சிக்னல் வந்ததும் தானியங்கி சரிபார்ப்பு நடக்கும்.',
     err_failed: 'தானியங்கி எண்ணுதல் தோல்வியடைந்தது ({msg}). ஒவ்வொரு லார்வாவையும் தொட்டு கையால் எண்ணுங்கள்.',
+    err_busy: 'குறுகிய நேரத்தில் பல புகைப்படங்கள் எண்ணப்பட்டன. அரை நிமிடம் காத்திருந்து மீண்டும் புகைப்படம் எடுங்கள், அல்லது ஒவ்வொரு லார்வாவையும் தொட்டு எண்ணுங்கள்.',
     saved_toast: 'சேமிக்கப்பட்டது. {n} எண்ணப்பட்டன.',
     save_failed_toast: 'சேமிக்க முடியவில்லை. உங்கள் சேமிப்பக இடத்தைப் பார்த்து மீண்டும் முயற்சிக்கவும் - எதுவும் தொலையவில்லை.',
 

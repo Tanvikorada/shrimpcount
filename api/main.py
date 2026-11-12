@@ -8,11 +8,12 @@ import json
 import os
 import sys
 import time
+from collections import defaultdict, deque
 from pathlib import Path
 
 import cv2
 import numpy as np
-from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi import FastAPI, File, HTTPException, Query, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "training"))
@@ -24,6 +25,8 @@ MODEL_PATH = os.environ.get("MODEL_PATH", "model/best.onnx")
 TILE = int(os.environ.get("TILE", "640"))
 CONF = float(os.environ.get("CONF", "0.25"))
 MAX_BYTES = 15 * 1024 * 1024
+MAX_PIXELS = 60_000_000                      # a 15 MB JPEG can hold far more pixels than any phone takes; refuse before they fill memory
+RATE_PER_MINUTE = int(os.environ.get("RATE_PER_MINUTE", "40"))
 
 app = FastAPI(title="ShrimpCount API", version="0.1.0")
 # Only our own sites (and a developer's localhost) may call this from a browser. This stops other websites using a
@@ -99,8 +102,28 @@ def parse_prior(prior: str | None):
     return pts
 
 
+_hits = defaultdict(deque)
+
+
+def check_rate(request: Request):
+    """Best-effort limit per caller, so one script cannot run up the free-tier bill. Serverless instances each keep their own
+    count, so this slows abuse rather than stopping it; real control would need a shared store."""
+    ip = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0].strip()
+    now = time.monotonic()
+    q = _hits[ip]
+    while q and now - q[0] > 60:
+        q.popleft()
+    if len(q) >= RATE_PER_MINUTE:
+        raise HTTPException(429, "Too many photos in a minute. Wait a moment and try again.", headers={"Retry-After": "30"})
+    q.append(now)
+    if len(_hits) > 5000:                                  # never let the table itself grow without bound
+        for k in [k for k, v in _hits.items() if not v or now - v[-1] > 60]:
+            del _hits[k]
+
+
 @app.post("/count")
 async def count(
+    request: Request,
     file: UploadFile = File(...),
     engine: str = Query("auto", pattern="^(auto|classical|onnx)$"),
     roi: str | None = Query(None, description="Optional circle 'cx,cy,r' (fractions) to count inside, e.g. the tray"),
@@ -108,12 +131,15 @@ async def count(
     size: str = Query("small", pattern="^(small|large)$", description="Larva size: small (up to about PL12) or large (PL13 and up)"),
     prior: str | None = Query(None, description="The operator's current tray outline, as a JSON array of [x,y] fractions, to refit onto this photo instead of starting from the generic preset"),
 ):
+    check_rate(request)
     data = await file.read()
     if len(data) > MAX_BYTES:
         raise HTTPException(413, "Image too large (max 15 MB).")
     img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
     if img is None:
         raise HTTPException(400, "Could not read image.")
+    if img.shape[0] * img.shape[1] > MAX_PIXELS:
+        raise HTTPException(413, "Image has too many pixels. Use a lower camera resolution.")
 
     model_ready = Path(MODEL_PATH).exists()
     if engine == "onnx" and not model_ready:

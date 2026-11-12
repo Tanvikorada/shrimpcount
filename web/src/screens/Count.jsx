@@ -165,9 +165,9 @@ export default function Count({ batchId, store, go }) {
       presetRef.current = data.tray_fit || data.tray_preset || null; setTrayNorm(presetRef.current); setGlare(data.meta?.glare_ignored || 0); setClump(data.meta?.clump_fraction ?? null); setEditTray(false)
       setPredicted(data.count); setEngine(data.engine); setMs(data.processing_ms); setMethod('ai'); setMode('remove')
     } catch (err) {
-      const noNet = err instanceof TypeError || !navigator.onLine
+      const noNet = err instanceof TypeError || !navigator.onLine || err.code === 'slow'
       setMethod('manual'); setMode('add'); setOffline(noNet)
-      setNote(noNet
+      setNote(err.code === 'busy' ? t('err_busy') : noNet
         ? t('err_offline')
         : t('err_failed', { msg: err.message }))
     }
