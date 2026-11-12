@@ -275,3 +275,17 @@ def test_strong_shape_gate_rejects_extreme_roundness():
     on, _ = detect(perfect_circle, Params(tray=None, work_width=200, strong_shape=True))
     off, _ = detect(perfect_circle, Params(tray=None, work_width=200))
     assert len(off) == 1 and len(on) == 0
+
+
+def test_clump_fraction_is_low_for_a_spread_tray_and_high_for_a_packed_one():
+    from classical import detect, Params
+    spread = detect(tray(300, seed=3, gap=40), Params(tray=None))[1]["clump_fraction"]
+    packed = detect(tray(2000, seed=3, gap=7), Params(tray=None))[1]["clump_fraction"]
+    assert spread is not None and packed is not None
+    assert spread < 0.1 and packed > spread + 0.2
+
+
+def test_clump_fraction_is_none_when_there_are_too_few_marks_to_say():
+    from classical import detect, Params
+    assert detect(tray(10), Params(tray=None))[1]["clump_fraction"] is None
+

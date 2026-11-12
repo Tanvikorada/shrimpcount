@@ -21,7 +21,7 @@ const cell = (v) => {
   return `"${t.replace(/"/g, '""')}"`
 }
 
-const HEAD = ['date', 'time', 'batch', 'species', 'pl_stage', 'larva_size', 'method', 'counter_result', 'final_count', 'manual_count', 'other_app_count', 'marks_added', 'marks_removed', 'tray_id', 'notes']
+const HEAD = ['date', 'time', 'batch', 'species', 'pl_stage', 'larva_size', 'method', 'counter_result', 'final_count', 'manual_count', 'other_app_count', 'marks_added', 'marks_removed', 'tray_id', 'clump_fraction', 'notes']
 
 export function countsCsv(rows, batches) {
   const byId = new Map(batches.map((b) => [b.id, b]))
@@ -30,7 +30,7 @@ export function countsCsv(rows, batches) {
     const d = new Date(s.timestamp)
     return [
       d.toISOString().slice(0, 10), d.toTimeString().slice(0, 5), b?.code ?? '', s.species ?? '', b?.plStage ?? '', s.larvaSize ?? '', s.method ?? '',
-      s.predicted ?? '', s.count, s.manualCount ?? '', s.otherCount ?? '', s.added ?? '', s.removed ?? '', s.trayId ?? '', s.notes ?? '',
+      s.predicted ?? '', s.count, s.manualCount ?? '', s.otherCount ?? '', s.added ?? '', s.removed ?? '', s.trayId ?? '', s.clump ?? '', s.notes ?? '',
     ].map(cell).join(',')
   })
   return [HEAD.join(','), ...lines].join('\n')

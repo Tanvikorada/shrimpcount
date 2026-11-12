@@ -28,3 +28,21 @@ def test_scores_the_counter_against_hand_counts_per_tray():
 def test_photos_of_one_tray_are_averaged():
     trays = per_tray([row("t", 1700, 1700, 1800), row("t", 1800, 1800, 1800)])
     assert len(trays) == 1 and trays[0]["counter"] == 1750 and trays[0]["photos"] == 2
+
+
+def test_clump_check_compares_flagged_and_unflagged_trays():
+    from field_test_report import report
+    rows = [
+        {"tray_id": "a", "counter_result": "1500", "final_count": "1500", "manual_count": "1750", "clump_fraction": "0.37"},
+        {"tray_id": "b", "counter_result": "1790", "final_count": "1790", "manual_count": "1800", "clump_fraction": "0.16"},
+    ]
+    out = report(rows)
+    assert "notice shown" in out and "no notice" in out
+    assert "bias -14.29%" in out and "bias -0.56%" in out
+
+
+def test_clump_check_says_so_when_one_side_is_empty():
+    from field_test_report import report
+    rows = [{"tray_id": "a", "counter_result": "1500", "final_count": "1500", "manual_count": "1750", "clump_fraction": "0.37"}]
+    assert "needs trays on both sides" in report(rows)
+

@@ -23,6 +23,7 @@ import { initCloud, useCloud } from './lib/cloud'
 import Landing from './screens/Landing'
 import { AuthPage, SetupPage } from './screens/Auth'
 import Access from './screens/Access'
+import { demoLimitReached } from './lib/demo'
 import Admin from './screens/Admin'
 import { hasEntered, isInstalledApp } from './lib/entry'
 import Tools from './screens/Tools'
@@ -39,6 +40,13 @@ function Quick({ store, go }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return null
+}
+
+// The free trial is checked when the count screen opens (not while someone is part-way through a count), so a direct link
+// to a count cannot skip the 2-count limit that the Count buttons already enforce.
+function CountGate({ batchId, store, go, cloud }) {
+  const [blocked] = useState(() => demoLimitReached(store, cloud))
+  return blocked ? <Access store={store} go={go} /> : <Count batchId={batchId} store={store} go={go} />
 }
 
 const path = () => window.location.hash.replace(/^#/, '') || '/'
@@ -124,7 +132,7 @@ export default function App() {
   else if (a === 'batches' && b === 'new') view = <NewBatch store={store} go={go} />
   else if (a === 'batches') view = <BatchList store={store} go={go} />
   else if (a === 'batch') view = <BatchDetail id={b} store={store} go={go} />
-  else if (a === 'count') view = <Count key={b} batchId={b} store={store} go={go} />
+  else if (a === 'count') view = <CountGate key={b} batchId={b} store={store} go={go} cloud={cloud} />
   else if (a === 'report') view = <Report id={b} store={store} go={go} />
   else if (a === 'orders' && b === 'new') view = <NewOrder store={store} go={go} />
   else if (a === 'orders') view = <OrderList store={store} go={go} />

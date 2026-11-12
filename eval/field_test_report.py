@@ -44,7 +44,7 @@ def per_tray(rows):
         def mean(key):
             v = [num(r.get(key)) for r in g if num(r.get(key))]
             return sum(v) / len(v) if v else None
-        out.append({"counter": mean("counter_result"), "final": mean("final_count"), "manual": mean("manual_count"), "other": mean("other_app_count"), "photos": len(g)})
+        out.append({"counter": mean("counter_result"), "final": mean("final_count"), "manual": mean("manual_count"), "other": mean("other_app_count"), "clump": mean("clump_fraction"), "photos": len(g)})
     return out
 
 
@@ -53,6 +53,23 @@ def line(title, s):
         return f"{title}: no pairs yet"
     return (f"{title}: trays={s['n']}  average error {s['MAPE_%']}%  bias {s['bias_%']:+}% (negative = counter reads low)  "
             f"worst {s['worst_abs_%']}%  within 5%: {s['within_5%']}%  within 2%: {s['within_2%']}%")
+
+
+CLUMP_WARN = 0.30   # the app's "may read low" notice (web/src/screens/Count.jsx); set from three trays, to be checked here
+
+
+def clump_check(trays):
+    """Does the app's clumping figure really separate the trays that read low from those that do not? Compares the bias of
+    trays at or above the notice threshold with those below. Reports only what the data shows; needs both groups."""
+    hi = [t for t in trays if t["clump"] is not None and t["clump"] >= CLUMP_WARN]
+    lo = [t for t in trays if t["clump"] is not None and t["clump"] < CLUMP_WARN]
+    if not hi or not lo:
+        return [f"Clumping check: needs trays on both sides of {CLUMP_WARN} (now {len(hi)} at or above, {len(lo)} below) before it can say anything."]
+    out = ["Clumping check (does the 'may read low' notice pick the right trays?):"]
+    for name, g in (("  notice shown  ", hi), ("  no notice     ", lo)):
+        s = summarize([(t["counter"], t["manual"]) for t in g])
+        out.append(f"{name}: trays={s['n']}  bias {s['bias_%']:+}%  average error {s['MAPE_%']}%")
+    return out
 
 
 def report(rows):
@@ -66,6 +83,7 @@ def report(rows):
     lines.append(line("Final (after corrections) vs hand  ", summarize([(t["final"], t["manual"]) for t in trays])))
     lines.append(line("Other app vs hand count            ", summarize([(t["other"], t["manual"]) for t in trays])))
     lines.append(line("Counter vs other app               ", summarize([(t["counter"], t["other"]) for t in trays])))
+    lines.extend(clump_check(with_manual))
     if len(with_manual) < 15:
         lines.append(f"Only {len(with_manual)} trays with a hand count. Fewer than about 15 different trays is too few to trust these percentages.")
     lines.append("Note: one person's hand count is itself uncertain by several percent. Have two people count and enter the average.")

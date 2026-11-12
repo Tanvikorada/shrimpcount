@@ -144,7 +144,7 @@ async def count(
                         "y2": float(b[3]), "confidence": round(float(b[4]), 3)} for b in boxes],
         "processing_ms": round((time.perf_counter() - t0) * 1000),
         "larva_size": size if use == "classical" else None,
-        "meta": {k: meta[k] for k in ("strong", "weak_round", "glare_ignored", "glare_fraction", "hidden_estimated") if k in meta},
+        "meta": {k: meta[k] for k in ("strong", "weak_round", "glare_ignored", "glare_fraction", "hidden_estimated", "clump_fraction") if k in meta},
         # starting outline of the tray floor (fractions of the photo). The app lets the operator adjust it and saves it.
         "tray_preset": PRESET_TRAY_NORM,
         "tray_fit": tray_fit,

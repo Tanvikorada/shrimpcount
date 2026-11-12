@@ -233,6 +233,24 @@ def preset_tray(w: int, h: int):
     return [(x * (w - 1), y * (h - 1)) for x, y in PRESET_TRAY_NORM]
 
 
+def _clump_fraction(xs, ys, near=12.0):
+    """Share of marks that have another mark closer than `near` working pixels. A photo-level measure of how much the
+    larvae touch or overlap, so how likely the count is to read low. Measured on the three known-count trays: 0.16 on the
+    one that read +0.5%, 0.34 on -3.7%, 0.37 on -13%. Three trays is a hypothesis, not a calibration: it is saved with
+    every count so the field test can confirm or drop it. Returns None for too few marks to mean anything."""
+    n = len(xs)
+    if n < 50:
+        return None
+    pts = np.stack([xs, ys], 1).astype(np.float32)
+    close = 0
+    for i0 in range(0, n, 500):
+        c = pts[i0:i0 + 500]
+        d2 = ((c[:, None, :] - pts[None, :, :]) ** 2).sum(-1)
+        d2[np.arange(len(c)), np.arange(i0, i0 + len(c))] = np.inf
+        close += int((d2.min(1) < near * near).sum())
+    return round(close / n, 3)
+
+
 def _split_clusters(dark, xs, ys, ratio, radius=6):
     """A spot whose dark mass is about k times that of a typical isolated larva is taken to be k larvae stacked on
     each other. Returns the original spots plus positions (jittered beside the spot) for the extra, hidden larvae."""
@@ -459,5 +477,6 @@ def detect(image_bgr: np.ndarray, p: Params = None):
     boxes += [[(x - half) * inv, (y - half) * inv, (x + half) * inv, (y + half) * inv, 0.5] for x, y in zip(hx, hy)]   # 0.5 = estimated hidden larva
     meta = {"engine": "classical", "strong": int(len(xs1)), "weak_round": int(len(xs2)), "outside_tray": outside, "hidden_estimated": hidden, "body_merged": merged, "glare_ignored": glare_dropped,
             "glare_fraction": round(float(glare.mean()), 4),
+            "clump_fraction": _clump_fraction(np.concatenate([xs1, xs2]), np.concatenate([ys1, ys2])),
             **{k: v for k, v in asdict(p).items() if k != "tray"}}
     return np.asarray(boxes, np.float32).reshape(-1, 5), meta

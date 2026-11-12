@@ -24,6 +24,11 @@ const lastTrayByBatch = {}
 // (a stress test with known counts showed the counter still reading a few percent low there; see docs/exception-cases.md).
 const CROWDED = 3500
 
+// A photo where this share of marks sit right against another mark: larvae are touching or overlapping, and the count tends
+// to read low. 0.30 sits between the three known-count trays (0.16 read +0.5%; 0.34 and 0.37 read -3.7% and -13%). That is
+// three trays - a starting point to confirm in the field test, not a calibration. The figure is saved with every count.
+const CLUMP_WARN = 0.30
+
 export default function Count({ batchId, store, go }) {
   const batch = store.batches.find((b) => b.id === batchId)
   const [phase, setPhase] = useState('capture') // capture | analyzing | review
@@ -46,6 +51,7 @@ export default function Count({ batchId, store, go }) {
   const [trayNorm, setTrayNorm] = useState(null) // outline of the water, fractions of the photo
   const [editTray, setEditTray] = useState(false)
   const [glare, setGlare] = useState(0)
+  const [clump, setClump] = useState(null)
   const [trays, setTrays] = useState(readTrays) // saved tray outlines; one per tray type or camera setup
   const [species, setSpecies] = useState(() => {
     try { return batch?.species || localStorage.getItem('shrimpcount.species') || 'Vannamei' } catch { return 'Vannamei' }
@@ -142,7 +148,7 @@ export default function Count({ batchId, store, go }) {
   }
 
   async function analyse(f, size = larva) {
-    setFile(f); setNote(''); setDets([]); setPredicted(null); setEngine(null); setOffline(false); setZoom(1); setNotes(''); setManualCount(''); setOtherCount('')
+    setFile(f); setNote(''); setDets([]); setPredicted(null); setEngine(null); setOffline(false); setZoom(1); setNotes(''); setManualCount(''); setOtherCount(''); setClump(null)
     const u = URL.createObjectURL(f)
     setUrl(u)
     const img = new Image()
@@ -156,7 +162,7 @@ export default function Count({ batchId, store, go }) {
       const data = await countImage(f, size, activeTray(readTrays())?.norm)
       setLarvaUsed(size)
       setDets(data.detections.map((d) => ({ cx: (d.x1 + d.x2) / 2, cy: (d.y1 + d.y2) / 2, r: Math.max(4, (d.x2 - d.x1 + d.y2 - d.y1) / 4), added: false, removed: false, est: data.engine === 'classical' && d.confidence === 0.5 })))
-      presetRef.current = data.tray_fit || data.tray_preset || null; setTrayNorm(presetRef.current); setGlare(data.meta?.glare_ignored || 0); setEditTray(false)
+      presetRef.current = data.tray_fit || data.tray_preset || null; setTrayNorm(presetRef.current); setGlare(data.meta?.glare_ignored || 0); setClump(data.meta?.clump_fraction ?? null); setEditTray(false)
       setPredicted(data.count); setEngine(data.engine); setMs(data.processing_ms); setMethod('ai'); setMode('remove')
     } catch (err) {
       const noNet = err instanceof TypeError || !navigator.onLine
@@ -240,7 +246,7 @@ export default function Count({ batchId, store, go }) {
     let row
     try {
       const thumb = await makeThumb(url)
-      row = store.addSample({ batchId, trayId, count, predicted: baseline, engine, method, notes, thumb, aiPending: offline, species, larvaSize: larvaUsed, added: edits.added, removed: edits.removed, manualCount: num(manualCount), otherCount: num(otherCount) })
+      row = store.addSample({ batchId, trayId, count, predicted: baseline, engine, method, notes, thumb, aiPending: offline, species, larvaSize: larvaUsed, added: edits.added, removed: edits.removed, clump, manualCount: num(manualCount), otherCount: num(otherCount) })
     } catch {
       // the photo and every mark are still on screen untouched - the operator can just try again
       window.dispatchEvent(new CustomEvent('sc-toast', { detail: { text: t('save_failed_toast'), tone: 'error' } }))
@@ -285,6 +291,7 @@ export default function Count({ batchId, store, go }) {
 
   const flags = [
     count > CROWDED && ['amber', t('flag_crowded')],
+    clump != null && clump >= CLUMP_WARN && count <= CROWDED && ['amber', t('flag_clumped')],
     hidden > 0 && ['slate', t('flag_hidden', { n: hidden })],
     glare > 0 && ['slate', t('flag_glare', { n: glare })],
   ].filter(Boolean)
