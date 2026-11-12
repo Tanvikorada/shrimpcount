@@ -1,7 +1,8 @@
 # Supabase's free plan pauses a project after about a week of low activity (accounts and backup then stop working).
-# This asks the database for one row every day so that does not happen. If it ever fails, GitHub emails the repo owner:
-# that is the signal to open the Supabase dashboard. The URL and anon key are public by design (they ship inside the
-# app); row-level security is what keeps the data private, and the request below can only ever read what it is allowed to.
+# Once a day this makes the auth service look up a user that does not exist, which is real database activity.
+# "400 invalid login" is the SUCCESS answer. A timeout or a 5xx means the project is paused or down: GitHub then emails
+# the repo owner, which is the signal to open the Supabase dashboard. The URL and anon key are public by design (they
+# ship inside the app); row-level security is what keeps the data private.
 name: keep Supabase awake
 on:
   schedule:
@@ -11,9 +12,9 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: ask the database for one row
+      - name: look up a user that does not exist
         run: |
           set -e
-          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "https://gqixvanhkytgoscohhbj.supabase.co/rest/v1/records?select=id&limit=1" -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxaXh2YW5oa3l0Z29zY29oaGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NzY3NjAsImV4cCI6MjEwNTU1Mjc2MH0.OsNgzugwOXldaBfveubS7NcaT7_rpOfORx3dmYe_ncA" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxaXh2YW5oa3l0Z29zY29oaGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NzY3NjAsImV4cCI6MjEwNTU1Mjc2MH0.OsNgzugwOXldaBfveubS7NcaT7_rpOfORx3dmYe_ncA")
-          echo "supabase answered HTTP $code"
-          test "$code" = "200"
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 -X POST "https://gqixvanhkytgoscohhbj.supabase.co/auth/v1/token?grant_type=password" -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxaXh2YW5oa3l0Z29zY29oaGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NzY3NjAsImV4cCI6MjEwNTU1Mjc2MH0.OsNgzugwOXldaBfveubS7NcaT7_rpOfORx3dmYe_ncA" -H "Content-Type: application/json" -d '{"email":"keepalive@example.com","password":"not-a-real-password"}')
+          echo "supabase answered HTTP $code (400 = awake)"
+          test "$code" = "400"
