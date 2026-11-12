@@ -1,0 +1,27 @@
+{
+  "packageId": "com.shrimpcount.app",
+  "host": "shrimpcount-ai.vercel.app",
+  "name": "ShrimpCount",
+  "launcherName": "ShrimpCount",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0B0E10",
+  "navigationColor": "#0B0E10",
+  "navigationColorDark": "#0B0E10",
+  "backgroundColor": "#0B0E10",
+  "enableNotifications": false,
+  "startUrl": "/app/",
+  "iconUrl": "https://shrimpcount-ai.vercel.app/app/icon-512.png",
+  "maskableIconUrl": "https://shrimpcount-ai.vercel.app/app/icon-maskable-512.png",
+  "webManifestUrl": "https://shrimpcount-ai.vercel.app/manifest.webmanifest",
+  "appVersion": "1",
+  "appVersionName": "1.0.0",
+  "signingKey": { "path": "./shrimpcount-upload.keystore", "alias": "shrimpcount" },
+  "fallbackType": "customtabs",
+  "features": {},
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "shortcuts": [
+    { "name": "Count a sample", "short_name": "Count", "url": "/app/#/quick", "icon": "https://shrimpcount-ai.vercel.app/app/icon-192.png" }
+  ]
+}

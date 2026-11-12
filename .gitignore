@@ -34,3 +34,11 @@ landing/_*.html
 **/__pycache__/
 *.log
 supabase/.temp/
+
+# Android signing keys and build output: never commit
+*.keystore
+*.jks
+tools/android/app/
+tools/android/*.aab
+tools/android/*.apk
+tools/android/signing-key-info.txt
