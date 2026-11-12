@@ -27,14 +27,14 @@ export function OrderList({ store, go }) {
             return (
               <Card key={o.id}>
                 <button className="flex min-h-[4.75rem] w-full items-center justify-between gap-3 p-4 text-left" onClick={() => go(`/order/${o.id}`)}>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-base font-semibold">{o.customer}</span>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2">
+                      <span className="text-base font-semibold [overflow-wrap:anywhere]">{o.customer}</span>
                       <Badge tone={o.status === 'delivered' ? 'teal' : 'amber'}>{o.status === 'delivered' ? t('o_delivered') : t('o_pending')}</Badge>
                     </div>
                     <div className="text-xs text-slate-500">{b ? t('o_batch_n', { c: b.code }) : t('o_no_batch')}{o.date ? ` · ${fmtDate(o.date)}` : ''}</div>
                   </div>
-                  <div className="text-right">
+                  <div className="max-w-[45%] text-right">
                     <div className="text-lg font-semibold tabular-nums">{fmt(o.plQuantity)}</div>
                     <div className="text-xs text-slate-500">PL{Number.isFinite(bal) ? (bal > 0 ? ` · ${t('o_due', { m: money(bal) })}` : ` · ${t('o_paid')}`) : ''}</div>
                   </div>

@@ -48,7 +48,7 @@ export default function Settings({ store, go, openLang }) {
             {TEXT_SIZES.map(([k]) => (
               /* label below */
               <button key={k} aria-pressed={(settings.textSize || 'large') === k} onClick={() => setSettings({ textSize: k })}
-                className={`min-h-12 flex-1 rounded-xl px-1 text-[0.9375rem] font-semibold ${(settings.textSize || 'large') === k ? 'bg-surface text-teal-700' : 'text-slate-500'}`}>{t(`size_${k}`)}</button>
+                className={`min-h-12 min-w-0 flex-1 rounded-xl px-1 text-[0.9375rem] font-semibold [overflow-wrap:anywhere] ${(settings.textSize || 'large') === k ? 'bg-surface text-teal-700' : 'text-slate-500'}`}>{t(`size_${k}`)}</button>
             ))}
           </div>
         </Card>

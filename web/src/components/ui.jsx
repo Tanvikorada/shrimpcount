@@ -30,7 +30,7 @@ const variants = {
 }
 export const Button = ({ variant = 'primary', className = '', onClick, ...p }) => (
   <button {...p} onClick={onClick && ((e) => { tap(); onClick(e) })}
-    className={`inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl px-5 text-base font-semibold disabled:opacity-50 ${variants[variant]} ${className}`} />
+    className={`inline-flex min-h-14 min-w-0 max-w-full items-center justify-center gap-2 rounded-2xl px-5 py-2 text-center text-base font-semibold [overflow-wrap:anywhere] disabled:opacity-50 ${variants[variant]} ${className}`} />
 )
 
 export const Empty = ({ title, body, action }) => (
@@ -61,7 +61,7 @@ export const PageHeader = ({ title, sub, onBack, right }) => (
         <h1 className="font-display text-[1.875rem] font-medium leading-[1.1] tracking-[-0.03em] text-slate-900">{title}</h1>
         {sub && <p className="mt-1 text-[0.9375rem] text-slate-500">{sub}</p>}
       </div>
-      {right && <div className="shrink-0 pb-1">{right}</div>}
+      {right && <div className="max-w-full pb-1">{right}</div>}
     </div>
   </div>
 )

@@ -22,15 +22,15 @@ export function BatchList({ store, go }) {
             return (
               <Card key={b.id}>
                 <button className="flex min-h-[4.75rem] w-full items-center justify-between gap-3 p-4 text-left" onClick={() => go(`/batch/${b.id}`)}>
-                  <div>
-                    <div className="flex items-center gap-2">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2">
                       <span className="text-[1.0625rem] font-bold tracking-tight text-slate-900">{b.code}</span>
                       {b.plStage && <Badge tone="teal">{b.plStage}</Badge>}
                       {b.status === 'closed' && <Badge>{t('b_closed')}</Badge>}
                     </div>
                     <div className="mt-0.5 text-[0.8125rem] text-slate-500">{b.tank ? `${t('tank_n', { t: b.tank })} · ` : ''}{t('b_created', { d: fmtDate(b.createdAt) })}</div>
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-right">
                     <div className="text-[1.5rem] font-bold leading-none tabular-nums tracking-tight text-slate-900">{st.n ? fmt(st.mean) : '–'}</div>
                     <div className="text-xs text-slate-500">{t('counts_n', { n: st.n })}</div>
                   </div>
