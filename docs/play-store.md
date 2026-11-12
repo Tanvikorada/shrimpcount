@@ -72,4 +72,4 @@ What only you can do: pay the one-time US$25 Google Play developer fee, verify y
 ## Screenshots and graphics
 
 Phone screenshots (at least 2, 16:9 to 9:16): `landing/media/app/*.jpg`. Retake them if the app's look changes.
-Icon: `landing/app/icon-512.png`. A 1024x500 feature graphic is still needed (the logo ring and dot on the dark background works).
+Icon: `landing/app/icon-512.png`. Feature graphic (1024x500): `tools/android/feature-graphic.png`, redrawn by `tools/android/make_feature_graphic.py`.
