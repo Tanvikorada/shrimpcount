@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Counting test | ShrimpCount</title>
+  <link rel="icon" href="/app/icon.svg" type="image/svg+xml" />
+  <style>
+    :root { --bg: #0B0E10; --ink: #F3F2ED; --ink-2: #B4BBC0; --line: rgb(243 242 237 / .18); --accent: #3FD6C6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Tamil", sans-serif; }
+    main { max-width: 52rem; margin: 0 auto; padding: 28px 18px 60px; }
+    h1 { font-size: 1.9rem; line-height: 1.15; margin: 14px 0 8px; letter-spacing: -0.02em; }
+    p, li { color: var(--ink-2); }
+    ol { padding-left: 1.3rem; } li { margin: 0 0 10px; }
+    b { color: var(--ink); }
+    .langs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .langs button { min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
+    .langs button[aria-pressed="true"] { background: var(--accent); color: #03201D; border-color: var(--accent); font-weight: 700; }
+    .print { margin-top: 14px; min-height: 44px; padding: 0 18px; border-radius: 10px; border: 0; background: var(--ink); color: #111; font: inherit; font-weight: 700; cursor: pointer; }
+    .lang { display: none; } .lang.on { display: block; }
+    .note { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; margin: 18px 0; color: var(--ink); }
+    .wrap { overflow-x: auto; margin-top: 18px; }
+    table { border-collapse: collapse; width: 100%; min-width: 40rem; }
+    th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; font-size: .85rem; vertical-align: bottom; }
+    th { color: var(--ink); font-weight: 600; }
+    td { height: 2.3rem; }
+    @media print {
+      :root { --bg: #fff; --ink: #111; --ink-2: #333; --line: #777; }
+      body { font-size: 12pt; }
+      .langs, .print { display: none; }
+      main { padding: 0; max-width: none; }
+      th, td { font-size: 10pt; } td { height: 1.9rem; }
+      .wrap { overflow: visible; } table { min-width: 0; }
+      .note { border-color: #111; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="langs" role="group" aria-label="Language">
+    <button type="button" data-l="en">English</button>
+    <button type="button" data-l="te">తెలుగు</button>
+    <button type="button" data-l="hi">हिन्दी</button>
+    <button type="button" data-l="ta">தமிழ்</button>
+  </div>
+  <button class="print" type="button" onclick="window.print()">Print / save as PDF</button>
+
+  <section class="lang" data-l="en" lang="en">
+    <h1>Counting test with ShrimpCount</h1>
+    <p>This test shows how close the app is to a careful hand count, on your own trays. It takes about two weeks of normal work and nothing extra to learn.</p>
+    <ol>
+      <li>Take the photo in the app as usual: same box, same height, same light.</li>
+      <li><b>Before you look at the app's number</b>, two people count the same tray by hand. Write both numbers in the table.</li>
+      <li>In the app, tap <b>Details</b>, type the average of the two hand counts in <b>Your hand count</b>, then tap <b>Save</b>.</li>
+      <li>Do not tap marks just to match the number. Fix a mark only when it is clearly wrong.</li>
+      <li>Do at least <b>15 different trays</b> (30 is better): thin and packed, different tanks and days, and whatever PL stages come. Write the PL stage. Photos of the same tray count as one tray. Take some photos quickly, a little tilted or with glare, the way a busy day goes.</li>
+      <li>At the end: <b>More</b> &rarr; <b>Count history</b> &rarr; <b>Download CSV</b>, and send the file to tanvikorada@gmail.com.</li>
+    </ol>
+    <p class="note">The point is a true number, not a good-looking one. Bad results are useful too.</p>
+    <div class="wrap"><table><thead><tr><th>Tray no.</th><th>Tank</th><th>PL stage</th><th>Person 1 count</th><th>Person 2 count</th><th>Average</th><th>App count</th></tr></thead><tbody class="rows"></tbody></table></div>
+  </section>
+
+  <section class="lang" data-l="te" lang="te">
+    <h1>ShrimpCount తో కౌంటింగ్ పరీక్ష</h1>
+    <p>ఈ పరీక్ష మీ సొంత ట్రేలపై జాగ్రత్తగా చేతితో లెక్కించిన కౌంట్‌కు యాప్ ఎంత దగ్గరగా ఉందో చూపిస్తుంది. రెండు వారాల సాధారణ పనిలో జరుగుతుంది, కొత్తగా నేర్చుకోవాల్సిందేమీ లేదు.</p>
+    <ol>
+      <li>యాప్‌లో ఎప్పటిలాగే ఫోటో తీయండి: అదే బాక్స్, అదే ఎత్తు, అదే వెలుతురు.</li>
+      <li><b>యాప్ సంఖ్య చూడకముందే</b>, ఇద్దరు వ్యక్తులు అదే ట్రేను చేతితో లెక్కించండి. రెండు సంఖ్యలను పట్టికలో రాయండి.</li>
+      <li>యాప్‌లో <b>వివరాలు</b> తాకి, <b>మీరు చేతితో లెక్కించినది</b>లో రెండు చేతి కౌంట్‌ల సగటును టైప్ చేసి, <b>సేవ్ చేయండి</b> తాకండి.</li>
+      <li>సంఖ్య సరిపోయేలా మార్కులను తాకవద్దు. ఒక మార్క్ స్పష్టంగా తప్పైతేనే సరిచేయండి.</li>
+      <li>కనీసం <b>15 వేర్వేరు ట్రేలు</b> చేయండి (30 అయితే మంచిది): పలుచగా, దట్టంగా ఉన్నవి, వేర్వేరు ట్యాంక్‌లు, రోజులు, వచ్చిన PL దశలు. PL దశ రాయండి. ఒకే ట్రే ఫోటోలన్నీ ఒక ట్రేగా లెక్క. పని ఎక్కువగా ఉన్న రోజున జరిగినట్లే కొన్ని ఫోటోలు త్వరగా, కొంచెం వంగి లేదా మెరుపుతో తీయండి.</li>
+      <li>చివరిలో: <b>మరిన్ని</b> &rarr; <b>కౌంట్ చరిత్ర</b> &rarr; <b>CSV డౌన్‌లోడ్</b>, ఆ ఫైల్‌ను tanvikorada@gmail.com కు పంపండి.</li>
+    </ol>
+    <p class="note">లక్ష్యం నిజమైన సంఖ్య, అందంగా కనిపించే సంఖ్య కాదు. చెడు ఫలితాలూ ఉపయోగకరమే.</p>
+    <div class="wrap"><table><thead><tr><th>ట్రే నం.</th><th>ట్యాంక్</th><th>PL దశ</th><th>మొదటి వ్యక్తి కౌంట్</th><th>రెండో వ్యక్తి కౌంట్</th><th>సగటు</th><th>యాప్ కౌంట్</th></tr></thead><tbody class="rows"></tbody></table></div>
+  </section>
+
+  <section class="lang" data-l="hi" lang="hi">
+    <h1>ShrimpCount के साथ गिनती की जाँच</h1>
+    <p>यह जाँच दिखाती है कि आपकी अपनी ट्रे पर ऐप सावधानी से की गई हाथ-गिनती के कितना करीब है। यह करीब दो हफ़्ते के सामान्य काम में हो जाती है, कुछ नया सीखना नहीं है।</p>
+    <ol>
+      <li>ऐप में हमेशा की तरह फ़ोटो लें: वही बॉक्स, वही ऊँचाई, वही रोशनी।</li>
+      <li><b>ऐप की संख्या देखने से पहले</b> दो लोग उसी ट्रे को हाथ से गिनें। दोनों संख्याएँ तालिका में लिखें।</li>
+      <li>ऐप में <b>विवरण</b> दबाएँ, <b>आपकी हाथ से गिनती</b> में दोनों हाथ-गिनती का औसत लिखें, फिर <b>सेव करें</b> दबाएँ।</li>
+      <li>संख्या मिलाने के लिए निशानों को न छेड़ें। निशान तभी ठीक करें जब वह साफ़ गलत हो।</li>
+      <li>कम से कम <b>15 अलग ट्रे</b> करें (30 हों तो बेहतर): हल्की और घनी, अलग टैंक और दिन, और जो भी PL चरण आएँ। PL चरण लिखें। एक ही ट्रे की कई फ़ोटो एक ट्रे गिनी जाती हैं। कुछ फ़ोटो जल्दी में, थोड़ी तिरछी या चमक के साथ भी लें, जैसे व्यस्त दिन में होता है।</li>
+      <li>आख़िर में: <b>और</b> &rarr; <b>गिनती का इतिहास</b> &rarr; <b>CSV डाउनलोड</b>, और फ़ाइल tanvikorada@gmail.com पर भेजें।</li>
+    </ol>
+    <p class="note">मक़सद सही संख्या पाना है, अच्छी दिखने वाली नहीं। बुरे नतीजे भी काम के हैं।</p>
+    <div class="wrap"><table><thead><tr><th>ट्रे नं.</th><th>टैंक</th><th>PL चरण</th><th>पहले व्यक्ति की गिनती</th><th>दूसरे व्यक्ति की गिनती</th><th>औसत</th><th>ऐप की गिनती</th></tr></thead><tbody class="rows"></tbody></table></div>
+  </section>
+
+  <section class="lang" data-l="ta" lang="ta">
+    <h1>ShrimpCount உடன் எண்ணும் சோதனை</h1>
+    <p>இந்தச் சோதனை உங்கள் சொந்த ட்ரேக்களில் கவனமாகக் கையால் எண்ணியதற்கு செயலி எவ்வளவு நெருக்கமாக உள்ளது என்பதைக் காட்டும். சுமார் இரண்டு வார வழக்கமான வேலையில் முடியும், புதிதாகக் கற்க எதுவும் இல்லை.</p>
+    <ol>
+      <li>செயலியில் வழக்கம்போல் புகைப்படம் எடுங்கள்: அதே பெட்டி, அதே உயரம், அதே வெளிச்சம்.</li>
+      <li><b>செயலியின் எண்ணைப் பார்ப்பதற்கு முன்</b>, இருவர் அதே ட்ரேயைக் கையால் எண்ணுங்கள். இரண்டு எண்களையும் அட்டவணையில் எழுதுங்கள்.</li>
+      <li>செயலியில் <b>விவரங்கள்</b> தொட்டு, <b>நீங்கள் கையால் எண்ணியது</b> இல் இரண்டு கைக் கணக்குகளின் சராசரியை உள்ளிட்டு, <b>சேமி</b> தொடுங்கள்.</li>
+      <li>எண் பொருந்துவதற்காகக் குறிகளைத் தொடாதீர்கள். ஒரு குறி தெளிவாகத் தவறாக இருந்தால் மட்டும் சரிசெய்யுங்கள்.</li>
+      <li>குறைந்தது <b>15 வெவ்வேறு ட்ரேக்கள்</b> செய்யுங்கள் (30 என்றால் நல்லது): மெல்லியவை, அடர்த்தியானவை, வெவ்வேறு தொட்டிகள், நாட்கள், வரும் PL நிலைகள். PL நிலையை எழுதுங்கள். ஒரே ட்ரேயின் புகைப்படங்கள் ஒரு ட்ரேவாகக் கணக்கிடப்படும். வேலை நிறைந்த நாளில் நடப்பது போல சில புகைப்படங்களை அவசரமாக, சற்று சாய்வாக அல்லது ஒளிர்வுடன் எடுங்கள்.</li>
+      <li>இறுதியில்: <b>மேலும்</b> &rarr; <b>எண்ணிக்கை வரலாறு</b> &rarr; <b>CSV பதிவிறக்கம்</b>, அந்தக் கோப்பை tanvikorada@gmail.com க்கு அனுப்புங்கள்.</li>
+    </ol>
+    <p class="note">நோக்கம் உண்மையான எண், அழகாகத் தெரியும் எண் அல்ல. மோசமான முடிவுகளும் பயனுள்ளவை.</p>
+    <div class="wrap"><table><thead><tr><th>ட்ரே எண்</th><th>தொட்டி</th><th>PL நிலை</th><th>முதல் நபர் எண்ணிக்கை</th><th>இரண்டாம் நபர் எண்ணிக்கை</th><th>சராசரி</th><th>செயலி எண்ணிக்கை</th></tr></thead><tbody class="rows"></tbody></table></div>
+  </section>
+</main>
+<script>
+  // 20 empty rows per language; the page opens in the language in the link (?lang=te) or the phone's language
+  document.querySelectorAll('.rows').forEach((tb) => { for (let i = 1; i <= 20; i++) tb.insertAdjacentHTML('beforeend', '<tr><td>' + i + '</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'); });
+  const LANGS = ['en', 'te', 'hi', 'ta'];
+  const pick = (l) => {
+    document.querySelectorAll('.lang').forEach((s) => s.classList.toggle('on', s.dataset.l === l));
+    document.querySelectorAll('.langs button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.l === l)));
+    document.documentElement.lang = l;
+  };
+  document.querySelectorAll('.langs button').forEach((b) => b.addEventListener('click', () => pick(b.dataset.l)));
+  const q = new URLSearchParams(location.search).get('lang');
+  const nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
+  pick(LANGS.includes(q) ? q : LANGS.includes(nav) ? nav : 'en');
+</script>
+</body>
+</html>
